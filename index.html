@@ -92,10 +92,6 @@
       </div>
     </main>
 
-    <div class="tech-note">
-      <b>静态网页，也能实时对战。</b>
-      <span>游戏数据通过浏览器间的加密连接传输，老师的设备负责统一结算。</span>
-    </div>
   </section>
 
   <div id="teacherView" class="app-view hidden">
@@ -175,7 +171,11 @@
   <div id="studentView" class="app-view hidden">
     <header class="app-header student-header">
       <a class="brand compact" href="./"><span class="brand-mark">茶</span><span><b id="studentCompanyHeader">我的公司</b><small id="studentClassHeader">正在连接</small></span></a>
-      <div class="header-actions"><span id="studentNetBadge" class="status-pill"><i></i> 连接中</span><button class="icon-button" type="button" data-action="leave-room">退出</button></div>
+      <div class="header-actions">
+        <button class="knowledge-button" type="button" data-action="open-knowledge" aria-haspopup="dialog"><span>知</span> 商科知识</button>
+        <span id="studentNetBadge" class="status-pill"><i></i> 连接中</span>
+        <button class="icon-button" type="button" data-action="leave-room">退出</button>
+      </div>
     </header>
 
     <main class="dashboard student-dashboard">
@@ -260,6 +260,30 @@
         <li><span>04</span><div><b>排名与复盘</b><p>排行榜实时同步，终局生成经营画像，老师可导出成绩。</p></div></li>
       </ol>
       <div class="callout yellow"><b>网络提示</b><p>所有设备需能访问互联网。校园网络若严格限制 WebRTC，建议提前用教师热点试跑一次。</p></div>
+    </div>
+  </div>
+
+  <div id="knowledgeModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="knowledgeTitle">
+    <div class="modal-card knowledge-card">
+      <button class="modal-close" type="button" data-action="close-knowledge" aria-label="关闭">×</button>
+      <div class="knowledge-topline">
+        <span id="knowledgeCategory" class="tag pink">经营基础</span>
+        <span class="step-label">BUSINESS BYTE</span>
+      </div>
+      <h2 id="knowledgeTitle">机会成本</h2>
+      <p id="knowledgeDefinition" class="knowledge-definition"></p>
+      <div class="knowledge-example">
+        <span>放进这家奶茶店</span>
+        <p id="knowledgeExample"></p>
+      </div>
+      <div class="knowledge-question">
+        <span>想一想</span>
+        <p id="knowledgeQuestion"></p>
+      </div>
+      <div class="knowledge-actions">
+        <button class="secondary-button" type="button" data-action="close-knowledge">知道了</button>
+        <button class="primary-button" type="button" data-action="next-knowledge">再抽一张 <span>↻</span></button>
+      </div>
     </div>
   </div>
 </body>

@@ -18,6 +18,21 @@ const EVENTS = [
   { id: "plastic-rule", name: "限塑新规", type: "黑天鹅", category: "black", desc: "环保新规即时生效，每家公司本轮增加 ¥45 合规成本。", prompt: "政策变化带来共同成本时，企业如何建立差异化？", market: 1, marketing: 1, cost: 0, sensitivity: 0, fixed: 45, spoilage: 0 }
 ];
 
+const BUSINESS_KNOWLEDGE = [
+  { category: "经营基础", title: "机会成本", definition: "选择一个方案时，被放弃的最佳替代方案所能带来的价值，就是这次选择的机会成本。它不一定出现在账单上，但会影响决策质量。", example: "把 ¥100 投入营销，就意味着这 ¥100 不能同时用于多进 25 杯原料；被放弃的潜在销售，就是营销决策的一部分成本。", question: "你们本轮投入最多的资源，原本还可以用在哪里？" },
+  { category: "成本管理", title: "盈亏平衡点", definition: "当总收入刚好等于总成本时，企业不赚也不亏。达到这一点所需要的销量，就是盈亏平衡销量。", example: "若每杯售价 ¥14、原料 ¥4、固定与营销支出共 ¥180，那么至少要卖出 18 杯左右才能覆盖成本。", question: "按你们现在的定价，本轮至少要卖出多少杯才不亏？" },
+  { category: "市场营销", title: "价格弹性", definition: "价格弹性描述顾客需求对价格变化有多敏感。弹性越高，小幅涨价就越可能带来明显的销量下降。", example: "考试周或低价竞品入场时，学生通常更在意价格；同样涨价 ¥2，流失的顾客可能比平时更多。", question: "你们的顾客为什么愿意接受更高或更低的价格？" },
+  { category: "财务思维", title: "利润不等于现金流", definition: "利润衡量一段时间的经营成果，现金流关注钱何时真正流入或流出。企业有利润，也可能因为现金周转不及时而陷入困境。", example: "本游戏是即时收款，所以利润与现金变化接近；真实奶茶店还可能先付房租和货款、后收到平台结算。", question: "如果外卖平台 30 天后才结算，本轮决策需要怎样改变？" },
+  { category: "决策科学", title: "沉没成本", definition: "已经发生且无法收回的成本叫沉没成本。理性决策应该关注未来的新增收益与成本，而不是为了“不浪费过去投入”继续加码。", example: "已经花掉的宣传费无法收回。如果活动效果很差，不应只因为前面投了很多钱就继续追加预算。", question: "你们有没有因为上一轮投入很多，而影响这一轮的判断？" },
+  { category: "供应链", title: "安全库存", definition: "为应对需求波动或供应延迟而额外保留的库存叫安全库存。它能降低缺货风险，但也会占用资金并增加损耗。", example: "多备鲜奶可能抓住突发客流，但当天卖不完就报废；这正是服务水平和库存成本之间的权衡。", question: "如果损耗成本降低一半，你们会增加多少进货？" },
+  { category: "竞争战略", title: "差异化优势", definition: "企业通过产品、体验、品牌或服务形成顾客愿意选择、且竞争者不易复制的独特价值，这就是差异化优势。", example: "高价并不自动代表高端。只有口味、包装、服务或品牌故事能支撑溢价时，高价路线才更可持续。", question: "除了降价，你们的公司还能靠什么赢得顾客？" },
+  { category: "市场营销", title: "边际收益递减", definition: "当其他条件不变时，持续增加某项投入，后来每增加一单位所带来的新增收益往往会越来越少。", example: "从零开始投入第一笔营销费可能很有效，但预算从 ¥180 增加到 ¥200，不一定还能带来同等比例的新顾客。", question: "你们认为营销预算从什么时候开始“不太划算”？" },
+  { category: "商业模型", title: "单位经济模型", definition: "把收入与变动成本拆到每一位顾客或每一件产品上，可以判断企业每完成一单是否真正创造价值。", example: "单杯贡献毛利约等于售价减去单杯原料成本。贡献毛利越高，覆盖固定成本所需的销量越少。", question: "你们每多卖一杯，能为覆盖固定成本贡献多少钱？" },
+  { category: "竞争战略", title: "规模经济", definition: "随着产量增加，固定成本被更多产品分摊，平均成本可能下降，这种现象叫规模经济。但扩大规模也可能带来管理与库存风险。", example: "现实中大批采购可能降低原料单价；但本游戏的鲜奶会报废，盲目追求销量仍可能造成亏损。", question: "什么条件满足后，扩大经营规模才真正有利？" },
+  { category: "风险管理", title: "情景分析", definition: "分别假设乐观、正常和悲观三种情况，再观察决策结果，可以帮助企业理解风险边界，而不是只押注一个预测。", example: "进货前可以分别估计客流增加 30%、保持不变和减少 30% 时的销量、损耗与现金余额。", question: "你们当前决策在最坏情况下还能承受多大亏损？" },
+  { category: "市场洞察", title: "市场细分", definition: "把需求、偏好或行为相近的顾客划为一组，并为其中最值得服务的群体设计产品和营销，这就是市场细分。", example: "赶时间的学生、追求低糖的学生和喜欢拍照分享的学生，可能重视完全不同的产品价值。", question: "你们最想服务哪一类学生？他们最在意什么？" }
+];
+
 const dom = id => document.getElementById(id);
 const money = value => `${value < 0 ? "-" : ""}¥${Math.abs(Math.round(value)).toLocaleString("zh-CN")}`;
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
@@ -37,6 +52,7 @@ let studentToken = "";
 let toastTimer = null;
 let intentionalExit = false;
 let reconnectTimer = null;
+let lastKnowledgeIndex = -1;
 
 function showToast(message) {
   const toast = dom("toast");
@@ -44,6 +60,28 @@ function showToast(message) {
   toast.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove("show"), 2300);
+}
+
+function showRandomKnowledge() {
+  let index = Math.floor(Math.random() * BUSINESS_KNOWLEDGE.length);
+  if (BUSINESS_KNOWLEDGE.length > 1 && index === lastKnowledgeIndex) index = (index + 1) % BUSINESS_KNOWLEDGE.length;
+  lastKnowledgeIndex = index;
+  const item = BUSINESS_KNOWLEDGE[index];
+  dom("knowledgeCategory").textContent = item.category;
+  dom("knowledgeTitle").textContent = item.title;
+  dom("knowledgeDefinition").textContent = item.definition;
+  dom("knowledgeExample").textContent = item.example;
+  dom("knowledgeQuestion").textContent = item.question;
+}
+
+function openKnowledge() {
+  showRandomKnowledge();
+  dom("knowledgeModal").classList.remove("hidden");
+  dom("knowledgeModal").querySelector(".modal-close").focus();
+}
+
+function closeKnowledge() {
+  dom("knowledgeModal").classList.add("hidden");
 }
 
 function switchView(viewId) {
@@ -711,6 +749,9 @@ function handleAction(action) {
   if (action === "download-results") downloadResults();
   if (action === "add-demo-teams") addDemoTeams();
   if (action === "resume-room") resumeRoom();
+  if (action === "open-knowledge") openKnowledge();
+  if (action === "next-knowledge") showRandomKnowledge();
+  if (action === "close-knowledge") closeKnowledge();
 }
 
 function addDemoTeams() {
@@ -740,6 +781,11 @@ document.addEventListener("click", event => {
   const actionButton = event.target.closest("[data-action]");
   if (actionButton) handleAction(actionButton.dataset.action);
   if (event.target === dom("guideModal")) dom("guideModal").classList.add("hidden");
+  if (event.target === dom("knowledgeModal")) closeKnowledge();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !dom("knowledgeModal").classList.contains("hidden")) closeKnowledge();
 });
 
 dom("teacherSetup").addEventListener("submit", event => {
