@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>奶茶大亨 · 商业经营沙盘 Demo</title>
+<style>
+  :root{
+    --bg:#FFF6EC;
+    --ink:#191411;
+    --paper:#FFFDF9;
+    --pink:#FFA7F0;
+    --pink-hot:#FF4FD8;
+    --peach:#FFB583;
+    --blue:#BBE9F2;
+    --sage:#C9E7B5;
+    --lav:#BAAAD7;
+    --yellow:#FDFF9B;
+    --red:#FF6B6B;
+    --bw:2.5px;
+    --shadow:6px 6px 0 var(--ink);
+    --shadow-sm:4px 4px 0 var(--ink);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{font-size:16px}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    min-height:100vh;
+    background-image:radial-gradient(rgba(25,20,17,.06) 1.5px, transparent 1.5px);
+    background-size:22px 22px;
+  }
+  .mono{font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:var(--paper);
+    border-bottom:var(--bw) solid var(--ink);
+    padding:14px 28px;
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  }
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo-cup{width:38px;height:38px;flex:none}
+  .logo h1{font-size:1.25rem;letter-spacing:.02em}
+  .logo small{display:block;font-size:.68rem;font-weight:600;letter-spacing:.18em;opacity:.55}
+  .live-badge{
+    display:inline-flex;align-items:center;gap:7px;
+    border:var(--bw) solid var(--ink);border-radius:80px;
+    padding:5px 14px;font-size:.72rem;font-weight:700;letter-spacing:.12em;
+    background:var(--sage);
+  }
+  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--ink);animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.75)}}
+  .hud{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}
+  .hud-item{
+    border:var(--bw) solid var(--ink);border-radius:14px;background:#fff;
+    padding:6px 16px;min-width:110px;box-shadow:var(--shadow-sm);
+  }
+  .hud-item label{display:block;font-size:.62rem;font-weight:700;letter-spacing:.15em;opacity:.55}
+  .hud-item .val{font-size:1.15rem;font-weight:800}
+  .hud-item.cash{background:var(--yellow)}
+
+  /* ---------- layout ---------- */
+  main{
+    max-width:1240px;margin:0 auto;padding:26px 22px 80px;
+    display:grid;grid-template-columns:400px 1fr;gap:26px;align-items:start;
+  }
+  @media (max-width:960px){main{grid-template-columns:1fr}}
+  .panel{
+    background:var(--paper);border:var(--bw) solid var(--ink);border-radius:20px;
+    box-shadow:var(--shadow);padding:22px;
+  }
+  .panel + .panel{margin-top:22px}
+  .panel-title{
+    display:flex;align-items:center;gap:10px;
+    font-size:.78rem;font-weight:800;letter-spacing:.2em;margin-bottom:16px;
+  }
+  .panel-title::after{content:"";flex:1;height:var(--bw);background:var(--ink);border-radius:2px}
+  .tag{
+    display:inline-block;border:var(--bw) solid var(--ink);border-radius:80px;
+    padding:2px 12px;font-size:.68rem;font-weight:800;letter-spacing:.08em;background:var(--blue);
+  }
+
+  /* ---------- decision panel ---------- */
+  .field{margin-bottom:22px}
+  .field-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+  .field-head .name{font-weight:800;font-size:.95rem}
+  .field-head .num{font-size:1.3rem;font-weight:800}
+  .field .hint{font-size:.72rem;opacity:.6;margin-bottom:10px;line-height:1.5}
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;width:100%;height:14px;
+    background:#fff;border:var(--bw) solid var(--ink);border-radius:80px;outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:30px;height:30px;border-radius:50%;
+    background:var(--pink-hot);border:var(--bw) solid var(--ink);
+    box-shadow:3px 3px 0 var(--ink);cursor:grab;transition:transform .12s ease;
+  }
+  input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(.88)}
+  input[type=range]::-moz-range-thumb{
+    width:26px;height:26px;border-radius:50%;background:var(--pink-hot);
+    border:var(--bw) solid var(--ink);box-shadow:3px 3px 0 var(--ink);cursor:grab;
+  }
+  .quick-row{display:flex;gap:8px;margin-top:10px}
+  .chip{
+    flex:1;border:var(--bw) solid var(--ink);border-radius:80px;background:#fff;
+    font-size:.7rem;font-weight:700;padding:5px 0;text-align:center;cursor:pointer;
+    transition:transform .1s ease,background .1s ease;user-select:none;
+  }
+  .chip:hover{background:var(--blue)}
+  .chip:active{transform:translate(2px,2px)}
+  .budget-bar{
+    border:var(--bw) solid var(--ink);border-radius:14px;background:#fff;
+    padding:12px 16px;margin-top:4px;
+  }
+  .budget-bar .row{display:flex;justify-content:space-between;font-size:.8rem;font-weight:700;margin:3px 0}
+  .budget-bar .row.total{border-top:2px dashed var(--ink);padding-top:8px;margin-top:8px;font-size:.9rem}
+  .over{color:#D33}
+
+  .btn3d{
+    display:block;width:100%;border:var(--bw) solid var(--ink);border-radius:16px;
+    background:var(--pink);color:var(--ink);font-weight:800;font-size:1.05rem;letter-spacing:.06em;
+    padding:16px 20px;cursor:pointer;margin-top:20px;
+    transform:translate(-5px,-5px);box-shadow:8px 8px 0 var(--ink);
+    transition:transform .12s ease,box-shadow .12s ease,background .12s ease;
+    font-family:inherit;
+  }
+  .btn3d:hover{background:var(--pink-hot)}
+  .btn3d:active{transform:translate(0,0);box-shadow:0 0 0 var(--ink)}
+  .btn3d:disabled{opacity:.45;cursor:not-allowed;transform:translate(-5px,-5px);box-shadow:8px 8px 0 var(--ink)}
+  .btn3d.ghost{background:#fff}
+  .btn3d.ghost:hover{background:var(--blue)}
+  .btn3d.mint{background:var(--sage)}
+  .btn3d.mint:hover{background:#A8DD8E}
+
+  /* ---------- event card flip ---------- */
+  .event-zone{perspective:1200px}
+  .flip-card{
+    position:relative;width:100%;min-height:190px;
+    transform-style:preserve-3d;transition:transform .65s cubic-bezier(.34,1.3,.4,1);
+  }
+  .flip-card.flipped{transform:rotateY(180deg)}
+  .face{
+    position:absolute;inset:0;backface-visibility:hidden;
+    border:var(--bw) solid var(--ink);border-radius:18px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:22px;text-align:center;gap:8px;
+  }
+  .face.front{background:repeating-linear-gradient(45deg,var(--lav),var(--lav) 14px,#CDBEEA 14px,#CDBEEA 28px);cursor:pointer}
+  .face.front .qmark{font-size:2.6rem;font-weight:800}
+  .face.front p{font-size:.75rem;font-weight:700;letter-spacing:.25em}
+  .face.back{background:var(--yellow);transform:rotateY(180deg)}
+  .face.back .ev-name{font-size:1.35rem;font-weight:800}
+  .face.back .ev-desc{font-size:.85rem;line-height:1.6;max-width:340px}
+  .face.back .ev-tag{margin-top:4px}
+
+  /* ---------- leaderboard ---------- */
+  .lb-row{
+    display:grid;grid-template-columns:44px 1fr auto auto;gap:10px;align-items:center;
+    border:var(--bw) solid var(--ink);border-radius:14px;background:#fff;
+    padding:10px 14px;margin-bottom:10px;
+    transition:transform .45s cubic-bezier(.34,1.4,.4,1),background .3s ease;
+  }
+  .lb-row.me{background:var(--blue)}
+  .lb-rank{
+    width:34px;height:34px;border:var(--bw) solid var(--ink);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.95rem;background:var(--paper);
+  }
+  .lb-row:nth-child(1) .lb-rank{background:var(--yellow)}
+  .lb-row:nth-child(2) .lb-rank{background:var(--peach)}
+  .lb-row:nth-child(3) .lb-rank{background:var(--sage)}
+  .lb-name{font-weight:800;font-size:.92rem}
+  .lb-name small{display:block;font-size:.65rem;font-weight:600;opacity:.55}
+  .lb-profit{font-size:.75rem;font-weight:700;text-align:right}
+  .lb-profit .up{color:#1a7f37}.lb-profit .down{color:#D33}
+  .lb-cash{font-size:1.05rem;font-weight:800;text-align:right;min-width:88px}
+  .rank-flash{animation:rankFlash .8s ease}
+  @keyframes rankFlash{0%{box-shadow:0 0 0 6px var(--pink)}100%{box-shadow:0 0 0 0 transparent}}
+
+  /* ---------- log ---------- */
+  .log{max-height:260px;overflow-y:auto;scrollbar-width:thin}
+  .log-item{
+    border-left:4px solid var(--ink);padding:8px 12px;margin-bottom:8px;
+    background:#fff;border-radius:0 10px 10px 0;font-size:.8rem;line-height:1.55;
+    animation:logIn .4s ease;
+  }
+  @keyframes logIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .log-item b{font-weight:800}
+  .log-item.event{background:var(--yellow)}
+  .log-item.good{background:var(--sage)}
+  .log-item.bad{background:#FFD3D3}
+
+  /* ---------- overlays ---------- */
+  .overlay{
+    position:fixed;inset:0;z-index:100;background:rgba(25,20,17,.55);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    backdrop-filter:blur(4px);
+  }
+  .modal{
+    background:var(--paper);border:3px solid var(--ink);border-radius:24px;
+    box-shadow:12px 12px 0 var(--ink);max-width:640px;width:100%;
+    padding:34px 36px;max-height:88vh;overflow-y:auto;
+    animation:bounceIn .55s cubic-bezier(.34,1.45,.4,1);
+  }
+  @keyframes bounceIn{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+  .modal h2{font-size:1.6rem;margin-bottom:6px;letter-spacing:.02em}
+  .modal .sub{font-size:.8rem;font-weight:600;opacity:.55;margin-bottom:20px}
+  .rules{display:grid;gap:10px;margin-bottom:22px}
+  .rule{
+    display:flex;gap:12px;align-items:flex-start;border:var(--bw) solid var(--ink);
+    border-radius:14px;padding:12px 16px;background:#fff;font-size:.85rem;line-height:1.55;
+  }
+  .rule .dot{flex:none;width:26px;height:26px;border:var(--bw) solid var(--ink);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.75rem;background:var(--peach)}
+  .name-input{
+    width:100%;border:var(--bw) solid var(--ink);border-radius:14px;background:#fff;
+    font-family:inherit;font-size:1rem;font-weight:700;padding:12px 16px;margin-bottom:6px;outline:none;
+  }
+  .name-input:focus{box-shadow:var(--shadow-sm)}
+  .podium{display:flex;align-items:flex-end;justify-content:center;gap:14px;margin:26px 0 8px}
+  .pod{text-align:center}
+  .pod .bar{
+    border:var(--bw) solid var(--ink);border-radius:12px 12px 0 0;
+    display:flex;flex-direction:column;justify-content:flex-start;align-items:center;
+    padding-top:10px;font-weight:800;width:110px;
+    animation:growUp .8s cubic-bezier(.34,1.4,.4,1) backwards;
+  }
+  @keyframes growUp{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1)}}
+  .pod .who{font-size:.8rem;font-weight:800;margin-top:8px;line-height:1.4}
+  .pod .who small{display:block;font-weight:600;opacity:.6}
+  .coach{
+    border:var(--bw) solid var(--ink);border-radius:16px;background:var(--blue);
+    padding:16px 18px;font-size:.85rem;line-height:1.7;margin-top:16px;
+  }
+  .coach b{font-weight:800}
+  .coach .coach-tag{margin-bottom:8px}
+  .result-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:14px}
+  .result-table th,.result-table td{border:2px solid var(--ink);padding:7px 10px;text-align:right}
+  .result-table th{background:var(--lav);font-weight:800;text-align:center}
+  .result-table td:first-child,.result-table th:first-child{text-align:left}
+  .hidden{display:none!important}
+
+  footer{
+    text-align:center;font-size:.7rem;font-weight:600;letter-spacing:.1em;
+    opacity:.5;padding:0 20px 30px;line-height:1.8;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg class="logo-cup" viewBox="0 0 48 48" fill="none">
+      <path d="M12 14h24l-3 26a4 4 0 0 1-4 3.6H19A4 4 0 0 1 15 40L12 14Z" fill="#FFA7F0" stroke="#191411" stroke-width="2.5"/>
+      <path d="M10 14h28" stroke="#191411" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M26 12 31 4" stroke="#191411" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="21" cy="34" r="2.4" fill="#191411"/><circle cx="27" cy="28" r="2.4" fill="#191411"/><circle cx="24" cy="38" r="2.4" fill="#191411"/>
+    </svg>
+    <div>
+      <h1>奶茶大亨 · 经营沙盘</h1>
+      <small>BUSINESS SIMULATION · 商科体验课教具 DEMO</small>
+    </div>
+  </div>
+  <span class="live-badge"><span class="live-dot"></span>ROUND LIVE</span>
+  <div class="hud">
+    <div class="hud-item"><label>当前轮次</label><div class="val mono" id="hudRound">1 / 4</div></div>
+    <div class="hud-item cash"><label>我的现金</label><div class="val mono" id="hudCash">¥1,000</div></div>
+    <div class="hud-item"><label>当前排名</label><div class="val mono" id="hudRank">—</div></div>
+  </div>
+</header>
+
+<main>
+  <!-- 左：决策面板 -->
+  <section class="panel" id="decisionPanel">
+    <div class="panel-title">本 轮 决 策</div>
+
+    <div class="field">
+      <div class="field-head">
+        <span class="name">定价 <span class="tag">PRICE</span></span>
+        <span class="num mono">¥<span id="priceVal">14</span> / 杯</span>
+      </div>
+      <div class="hint">价高利润厚但客流会流失，参考区间 ¥10–18</div>
+      <input type="range" id="price" min="8" max="24" value="14" step="1">
+      <div class="quick-row">
+        <span class="chip" onclick="setVal('price',10)">平价走量 ¥10</span>
+        <span class="chip" onclick="setVal('price',14)">均衡 ¥14</span>
+        <span class="chip" onclick="setVal('price',18)">高端 ¥18</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <span class="name">进货量 <span class="tag" style="background:var(--peach)">STOCK</span></span>
+        <span class="num mono"><span id="stockVal">90</span> 杯</span>
+      </div>
+      <div class="hint">原料成本 <b id="unitCostLabel">¥4.0</b>/杯，鲜奶当天售罄，卖不完即报废</div>
+      <input type="range" id="stock" min="0" max="200" value="90" step="10">
+      <div class="quick-row">
+        <span class="chip" onclick="setVal('stock',60)">保守 60</span>
+        <span class="chip" onclick="setVal('stock',100)">稳健 100</span>
+        <span class="chip" onclick="setVal('stock',150)">激进 150</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-head">
+        <span class="name">营销投入 <span class="tag" style="background:var(--lav)">MARKETING</span></span>
+        <span class="num mono">¥<span id="mktVal">60</span></span>
+      </div>
+      <div class="hint">发传单 / 社群推广，能拉升本轮客流</div>
+      <input type="range" id="mkt" min="0" max="200" value="60" step="10">
+      <div class="quick-row">
+        <span class="chip" onclick="setVal('mkt',0)">不投 ¥0</span>
+        <span class="chip" onclick="setVal('mkt',80)">适度 ¥80</span>
+        <span class="chip" onclick="setVal('mkt',160)">猛砸 ¥160</span>
+      </div>
+    </div>
+
+    <div class="budget-bar">
+      <div class="row"><span>原料成本</span><span class="mono" id="bStock">¥360</span></div>
+      <div class="row"><span>营销投入</span><span class="mono" id="bMkt">¥60</span></div>
+      <div class="row"><span>房租人工（固定）</span><span class="mono">¥120</span></div>
+      <div class="row total"><span>本轮预计支出</span><span class="mono" id="bTotal">¥540</span></div>
+    </div>
+
+    <button class="btn3d" id="submitBtn" onclick="submitDecision()">提交决策 · 开门营业</button>
+  </section>
+
+  <!-- 右：市场 / 榜单 / 日志 -->
+  <section>
+    <div class="panel event-zone">
+      <div class="panel-title">市 场 事 件 卡</div>
+      <div class="flip-card" id="flipCard">
+        <div class="face front" onclick="maybeFlip()">
+          <div class="qmark">?</div>
+          <p>提交决策后揭晓本轮市场事件</p>
+        </div>
+        <div class="face back" id="eventBack">
+          <div class="ev-name" id="evName">—</div>
+          <div class="ev-desc" id="evDesc">—</div>
+          <span class="tag ev-tag" id="evTag">EVENT</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">龙 虎 榜 · 实 时 排 名</div>
+      <div id="leaderboard"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">经 营 日 志</div>
+      <div class="log" id="log"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  本 DEMO 为商科入校体验课教具示例 · 完整版支持多组实时联网对战、导师后台控场与数据导出<br>
+  体验课中模拟的决策逻辑，正是 BPA / BPC / CTB 等赛事商业案例分析环节考察的核心能力
+</footer>
+
+<!-- 开场规则弹窗 -->
+<div class="overlay" id="startOverlay">
+  <div class="modal">
+    <h2>欢迎来到奶茶大亨</h2>
+    <div class="sub">你和另外 3 支队伍各开一家校园奶茶店，4 轮经营后，现金最多的队伍获胜。</div>
+    <div class="rules">
+      <div class="rule"><span class="dot">1</span><span><b>每轮做 3 个决策</b>：定价、进货量、营销投入。决策提交后不可更改。</span></div>
+      <div class="rule"><span class="dot" style="background:var(--yellow)">2</span><span><b>每轮有一张随机市场事件</b>：暴雨、网红探店、原料涨价……市场不会按你的剧本走。</span></div>
+      <div class="rule"><span class="dot" style="background:var(--sage)">3</span><span><b>卖不完的鲜奶报废</b>，但固定成本照付。库存与需求的平衡是活下来的关键。</span></div>
+      <div class="rule"><span class="dot" style="background:var(--pink)">4</span><span><b>初始资金 ¥1,000</b>。现金为负即破产出局，撑到最后且现金最多者夺冠。</span></div>
+    </div>
+    <input class="name-input" id="teamName" maxlength="10" placeholder="给你的队伍起个名字（如：珍珠突击队）">
+    <button class="btn3d mint" onclick="startGame()">领取 ¥1,000 启动资金，开店！</button>
+  </div>
+</div>
+
+<!-- 结算弹窗 -->
+<div class="overlay hidden" id="resultOverlay">
+  <div class="modal">
+    <h2 id="resTitle">第 1 轮结算</h2>
+    <div class="sub" id="resSub">市场结果已出，各队战报如下</div>
+    <table class="result-table" id="resTable"></table>
+    <button class="btn3d" id="nextBtn" onclick="nextRound()">进入下一轮</button>
+  </div>
+</div>
+
+<!-- 终局弹窗 -->
+<div class="overlay hidden" id="finalOverlay">
+  <div class="modal">
+    <h2>最终战报</h2>
+    <div class="sub">4 轮经营结束，龙虎榜定格</div>
+    <div class="podium" id="podium"></div>
+    <div class="coach" id="coachBox"></div>
+    <button class="btn3d ghost" onclick="location.reload()">再来一局</button>
+  </div>
+</div>
+
+<script>
+/* ================= 游戏配置 ================= */
+const TOTAL_ROUNDS = 4;
+const START_CASH   = 1000;
+const FIXED_COST   = 120;
+const BASE_COST    = 4.0;
+const BASE_TRAFFIC = 120;
+
+const EVENTS = [
+  {name:"烈日晴天",   desc:"放学路上人人想喝冰饮，本轮市场客流 +15%。",                tag:"利好", cls:"good", traffic:1.15, cost:0,   mkt:1,  sens:0},
+  {name:"暴雨突袭",   desc:"大雨困住学生，街上冷冷清清，本轮市场客流 −35%。",           tag:"利空", cls:"bad",  traffic:0.65, cost:0,   mkt:1,  sens:0},
+  {name:"网红来探店", desc:"百万粉博主空降校门口！本轮所有队伍的营销效果翻倍。",         tag:"机会", cls:"good", traffic:1,    cost:0,   mkt:2,  sens:0},
+  {name:"鲜奶涨价",   desc:"供应商临时调价，本轮原料成本每杯 +¥1.5。",                  tag:"利空", cls:"bad",  traffic:1,    cost:1.5, mkt:1,  sens:0},
+  {name:"考试周来临", desc:"大家都在复习，对价格格外敏感：客流 −10%，高价杯更难卖。",    tag:"波动", cls:"bad",  traffic:0.9,  cost:0,   mkt:1,  sens:0.12},
+];
+
+/* AI 队伍策略：定价 / 进货 / 营销 各有性格 */
+const AI_PROFILES = [
+  {name:"银河战队",   style:"高价高营销 · 品牌流",   price:[16,19], stock:[90,130], mkt:[110,170]},
+  {name:"卷王联盟",   style:"低价走量 · 性价比流",   price:[9,12],  stock:[120,160],mkt:[20,60]},
+  {name:"佛系奶茶铺", style:"随缘经营 · 波动较大",   price:[11,16], stock:[70,120], mkt:[0,100]},
+];
+
+let state = null;
+
+/* ================= 工具 ================= */
+const $ = id => document.getElementById(id);
+const rnd = (a,b) => a + Math.random()*(b-a);
+const rndi = (a,b) => Math.round(rnd(a,b));
+const fmt = n => (n<0?"-¥":"¥") + Math.abs(Math.round(n)).toLocaleString();
+
+function acceptance(price, sensBonus){
+  return Math.max(0.06, Math.min(1.5, 1.85 - price/11.5 - sensBonus));
+}
+
+function simulate(team, ev, traffic){
+  const unit = BASE_COST + ev.cost;
+  const mktMult = (1 + team.mkt/160) * ev.mkt;
+  const demand = Math.max(0, Math.round(traffic * ev.traffic * acceptance(team.price, ev.sens) * mktMult + rnd(-8,8)));
+  const sales  = Math.min(team.stock, demand);
+  const revenue = sales * team.price;
+  const cost = team.stock*unit + team.mkt + FIXED_COST;
+  const profit = revenue - cost;
+  team.cash += profit;
+  team.history.push({sales, demand, revenue, cost, profit, price:team.price, stock:team.stock, mkt:team.mkt});
+  return {sales, demand, revenue, cost, profit, unit};
+}
+
+/* ================= 开局 ================= */
+function startGame(){
+  const name = $("teamName").value.trim() || "我的队伍";
+  state = {
+    round: 1,
+    traffic: Math.round(BASE_TRAFFIC + rnd(-12,12)),
+    deck: [...EVENTS].sort(()=>Math.random()-.5),
+    teams: [
+      {name, me:true, cash:START_CASH, history:[], price:14, stock:90, mkt:60},
+      ...AI_PROFILES.map(p=>({...p, me:false, cash:START_CASH, history:[]}))
+    ]
+  };
+  $("startOverlay").classList.add("hidden");
+  addLog(`<b>${name}</b> 领取 ${fmt(START_CASH)} 启动资金，正式开店！本轮市场基础客流约 <b>${state.traffic}</b> 人。`, "");
+  renderLB();
+  updateHUD();
+  syncUI();
+}
+
+/* ================= 决策面板 ================= */
+function setVal(id, v){ $(id).value = v; syncUI(); }
+function syncUI(){
+  const price=+$("price").value, stock=+$("stock").value, mkt=+$("mkt").value;
+  $("priceVal").textContent=price; $("stockVal").textContent=stock; $("mktVal").textContent=mkt;
+  const ev = state && state.round>1 ? null : null; // 成本在提交前按基准价展示
+  const unit = BASE_COST;
+  $("unitCostLabel").textContent = "¥"+unit.toFixed(1);
+  const sc = stock*unit;
+  $("bStock").textContent = fmt(sc);
+  $("bMkt").textContent = fmt(mkt);
+  const total = sc + mkt + FIXED_COST;
+  const cash = state ? state.teams[0].cash : START_CASH;
+  $("bTotal").textContent = fmt(total);
+  $("bTotal").classList.toggle("over", total > cash);
+  $("bTotal").textContent = fmt(total) + (total>cash ? "（超出所持现金！）" : "");
+}
+
+["price","stock","mkt"].forEach(id=>$(id).addEventListener("input", syncUI));
+
+/* ================= 回合流程 ================= */
+function submitDecision(){
+  const me = state.teams[0];
+  const price=+$("price").value, stock=+$("stock").value, mkt=+$("mkt").value;
+  if(stock*BASE_COST + mkt + FIXED_COST > me.cash){
+    alert("本轮支出超过了你的现金储备，调低进货量或营销投入吧！");
+    return;
+  }
+  me.price=price; me.stock=stock; me.mkt=mkt;
+  // AI 决策
+  state.teams.forEach(t=>{
+    if(t.me) return;
+    const prof = AI_PROFILES.find(p=>p.name===t.name);
+    t.price = rndi(prof.price[0], prof.price[1]);
+    t.stock = rndi(prof.stock[0]/10, prof.stock[1]/10)*10;
+    t.mkt   = rndi(prof.mkt[0]/10, prof.mkt[1]/10)*10;
+    // 现金不足时 AI 收缩
+    while(t.stock*BASE_COST + t.mkt + FIXED_COST > t.cash && t.stock>0) t.stock-=10;
+  });
+
+  const ev = state.deck[(state.round-1) % state.deck.length];
+  state.currentEvent = ev;
+
+  // 翻事件卡
+  $("evName").textContent = ev.name;
+  $("evDesc").textContent = ev.desc;
+  $("evTag").textContent  = ev.tag + " · EVENT";
+  $("evTag").style.background = ev.cls==="good" ? "var(--sage)" : "var(--peach)";
+  $("flipCard").classList.add("flipped");
+  addLog(`市场事件：<b>${ev.name}</b> —— ${ev.desc}`, "event");
+
+  // 结算
+  const results = state.teams.map(t=>{
+    const r = simulate(t, ev, state.traffic);
+    return {team:t, ...r};
+  });
+
+  setTimeout(()=>showResult(results, ev), 900);
+}
+
+function showResult(results, ev){
+  const meRes = results.find(r=>r.team.me);
+  $("resTitle").textContent = `第 ${state.round} 轮结算 · ${ev.name}`;
+  $("resSub").textContent   = `你的实际客流 ${meRes.demand} 人，卖出 ${meRes.sales} 杯` +
+    (meRes.sales < meRes.team.stock ? `，报废 ${meRes.team.stock - meRes.sales} 杯` : "，全部售罄！");
+  let html = `<tr><th>队伍</th><th>定价</th><th>进货</th><th>卖出</th><th>营销</th><th>本轮利润</th><th>现金余额</th></tr>`;
+  results.sort((a,b)=>b.team.cash-a.team.cash).forEach(r=>{
+    html += `<tr${r.team.me?' style="background:var(--blue);font-weight:700"':''}>
+      <td>${r.team.name}${r.team.me?"（你）":""}</td>
+      <td>¥${r.price}</td><td>${r.stock}</td><td>${r.sales}</td><td>¥${r.mkt}</td>
+      <td style="color:${r.profit>=0?'#1a7f37':'#D33'};font-weight:800">${r.profit>=0?"+":""}${fmt(r.profit)}</td>
+      <td style="font-weight:800">${fmt(r.team.cash)}</td></tr>`;
+  });
+  $("resTable").innerHTML = html;
+  $("nextBtn").textContent = state.round >= TOTAL_ROUNDS ? "查看最终战报" : "进入下一轮";
+
+  addLog(`你本轮利润 <b>${meRes.profit>=0?"+":""}${fmt(meRes.profit)}</b>，现金余额 <b>${fmt(meRes.team.cash)}</b>。`, meRes.profit>=0?"good":"bad");
+
+  renderLB(true);
+  updateHUD();
+  $("resultOverlay").classList.remove("hidden");
+}
+
+function nextRound(){
+  $("resultOverlay").classList.add("hidden");
+  if(state.round >= TOTAL_ROUNDS){ showFinal(); return; }
+  state.round++;
+  state.traffic = Math.round(BASE_TRAFFIC + rnd(-12,12));
+  $("flipCard").classList.remove("flipped");
+  addLog(`—— 第 ${state.round} 轮开始，本轮市场基础客流约 <b>${state.traffic}</b> 人 ——`, "");
+  updateHUD();
+  syncUI();
+}
+
+/* ================= 终局 ================= */
+function showFinal(){
+  const ranked = [...state.teams].sort((a,b)=>b.cash-a.cash);
+  const medalBg = ["var(--yellow)","var(--peach)","var(--sage)"];
+  const heights = [150, 110, 80];
+  const order = [1,0,2]; // 银-金-铜 排列
+  $("podium").innerHTML = order.map((idx,pos)=>{
+    const t = ranked[idx]; if(!t) return "";
+    return `<div class="pod">
+      <div class="bar" style="height:${heights[idx]}px;background:${medalBg[idx]};animation-delay:${pos*.15}s">${idx+1}</div>
+      <div class="who">${t.name}${t.me?"（你）":""}<small class="mono">${fmt(t.cash)}</small></div>
+    </div>`;
+  }).join("") + (ranked[3] ? `<div class="pod"><div class="bar" style="height:50px;background:#eee;animation-delay:.45s">4</div><div class="who">${ranked[3].name}${ranked[3].me?"（你）":""}<small class="mono">${fmt(ranked[3].cash)}</small></div></div>` : "");
+
+  $("coachBox").innerHTML = `<span class="tag coach-tag">导师点评</span><br>` + buildCoachComment(ranked);
+  $("finalOverlay").classList.remove("hidden");
+}
+
+function buildCoachComment(ranked){
+  const me = state.teams[0];
+  const rank = ranked.indexOf(me)+1;
+  const h = me.history;
+  const avgPrice = h.reduce((s,x)=>s+x.price,0)/h.length;
+  const totalMkt = h.reduce((s,x)=>s+x.mkt,0);
+  const waste = h.reduce((s,x)=>s+Math.max(0,x.stock-x.sales),0);
+  const totalStock = h.reduce((s,x)=>s+x.stock,0);
+  const wasteRate = totalStock? waste/totalStock : 0;
+
+  let s = `<b>最终排名：第 ${rank} 名</b>（现金 ${fmt(me.cash)}）。`;
+  if(rank===1) s += "冠军！你的经营节奏非常稳。";
+  else if(rank===2) s += "距离冠军只差一步，已经很出色。";
+  else s += "有不少值得复盘的决策点，这正是沙盘的意义。";
+
+  s += "<br><br><b>决策画像：</b>";
+  s += avgPrice>=16 ? "你走的是高端定价路线，单杯利润高，但对客流波动更敏感——"
+     : avgPrice<=11 ? "你走的是低价走量路线，销量稳，但要警惕'忙而不赚'——"
+     : "你的定价比较均衡，攻守兼备——";
+  s += totalMkt>=400 ? "营销投入很激进，品牌声量足；" : totalMkt<=120 ? "营销投入偏保守，可能错失了客流红利；" : "营销节奏张弛有度；";
+  s += wasteRate>0.25 ? `原料报废率约 ${Math.round(wasteRate*100)}%，<b>库存管理是你最大的利润黑洞</b>，试试用需求预测反推进货量。`
+     : wasteRate<0.08 ? "库存控制极佳，几乎没有浪费，供应链直觉很好。"
+     : `原料报废率约 ${Math.round(wasteRate*100)}%，尚有优化空间。`;
+
+  s += "<br><br><b>进阶提示：</b>刚才你在 5 分钟内做的定价、需求预测、成本权衡，正是 <b>BPA / BPC 商业案例分析</b>赛制中评委考察的核心逻辑——真实赛事中，你要分析真实企业、面对真实评委答辩。";
+  return s;
+}
+
+/* ================= 榜单 / HUD / 日志 ================= */
+function renderLB(animate){
+  const ranked = [...state.teams].sort((a,b)=>b.cash-a.cash);
+  $("leaderboard").innerHTML = ranked.map((t,i)=>{
+    const last = t.history[t.history.length-1];
+    const profit = last ? last.profit : 0;
+    return `<div class="lb-row ${t.me?'me':''} ${animate?'rank-flash':''}">
+      <span class="lb-rank mono">${i+1}</span>
+      <div class="lb-name">${t.name}${t.me?"（你）":""}<small>${t.me?"你的队伍":t.style}</small></div>
+      <div class="lb-profit mono">${last?`<span class="${profit>=0?'up':'down'}">${profit>=0?'▲':'▼'} ${fmt(Math.abs(profit))}</span>`:"—"}</div>
+      <div class="lb-cash mono">${fmt(t.cash)}</div>
+    </div>`;
+  }).join("");
+}
+
+function updateHUD(){
+  const me = state.teams[0];
+  const rank = [...state.teams].sort((a,b)=>b.cash-a.cash).indexOf(me)+1;
+  $("hudRound").textContent = `${state.round} / ${TOTAL_ROUNDS}`;
+  $("hudCash").textContent = fmt(me.cash);
+  $("hudRank").textContent = "第 " + rank + " 名";
+}
+
+function addLog(html, cls){
+  const div = document.createElement("div");
+  div.className = "log-item " + (cls||"");
+  div.innerHTML = html;
+  $("log").prepend(div);
+}
+
+function maybeFlip(){ /* 事件卡仅由结算逻辑翻转，防止偷看 */ }
+
+/* 初始化面板数值 */
+syncUI();
+</script>
+</body>
+</html>
