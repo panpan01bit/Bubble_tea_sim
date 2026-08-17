@@ -7,15 +7,21 @@ const TEACHER_STORAGE_KEY = "bubble-tea-classroom-v2";
 const STUDENT_TOKEN_KEY = "bubble-tea-student-token-v2";
 
 const EVENTS = [
-  { id: "heatwave", name: "盛夏热浪", type: "机会", category: "normal", desc: "体感温度突破 35℃，冰饮需求集中爆发，市场总客流 +25%。", prompt: "需求突然放大时，备货不足和备货过量，哪个代价更高？", market: 1.25, marketing: 1, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
-  { id: "rainstorm", name: "暴雨突袭", type: "风险", category: "normal", desc: "大雨让线下客流锐减，市场总客流 −30%。", prompt: "面对不可控的需求下滑，企业如何给现金流留出安全垫？", market: .70, marketing: 1, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
-  { id: "influencer", name: "网红探店", type: "机会", category: "normal", desc: "校园博主发起奶茶测评，本轮营销带来的获客效果提升 70%。", prompt: "风口会放大投入效果，但是否意味着营销越多越好？", market: 1.08, marketing: 1.7, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
-  { id: "milk-price", name: "鲜奶涨价", type: "成本", category: "normal", desc: "上游供应紧张，本轮每杯原料成本增加 ¥1.5。", prompt: "成本上涨时，应该涨价、压缩利润，还是减少备货？", market: 1, marketing: 1, cost: 1.5, sensitivity: 0, fixed: 0, spoilage: 0 },
-  { id: "price-war", name: "低价竞品入场", type: "竞争", category: "normal", desc: "连锁品牌在校门口发放优惠券，顾客对高价产品更加敏感。", prompt: "竞争对手降价时，跟进价格战是不是唯一答案？", market: 1.04, marketing: 1, cost: 0, sensitivity: .035, fixed: 0, spoilage: 0 },
-  { id: "sports-day", name: "校园运动会", type: "机会", category: "normal", desc: "运动会带来集中客流，市场扩大 35%，营销效果也略有提升。", prompt: "可预期的旺季到来前，经营者应该提前配置哪些资源？", market: 1.35, marketing: 1.15, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
-  { id: "power-cut", name: "冷柜停电", type: "黑天鹅", category: "black", desc: "临时停电造成部分鲜奶变质，本轮已购原料有 25% 无法出售。", prompt: "小概率、高损失事件发生后，供应链韧性体现在哪里？", market: .95, marketing: 1, cost: 0, sensitivity: 0, fixed: 0, spoilage: .25 },
-  { id: "food-rumor", name: "食品安全舆情", type: "黑天鹅", category: "black", desc: "社交平台出现原料质疑，市场缩小 18%，但有效营销更能重建信任。", prompt: "危机公关的目标是增加曝光，还是重建信任？", market: .82, marketing: 1.45, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
-  { id: "plastic-rule", name: "限塑新规", type: "黑天鹅", category: "black", desc: "环保新规即时生效，每家公司本轮增加 ¥45 合规成本。", prompt: "政策变化带来共同成本时，企业如何建立差异化？", market: 1, marketing: 1, cost: 0, sensitivity: 0, fixed: 45, spoilage: 0 }
+  { id: "heatwave", name: "高温需求上行", type: "需求", category: "normal", newsCategory: "天气 · 城市", headline: "气象台连续第三日发布橙色高温预警", bulletin: "未来一周午后体感温度预计超过 38℃。校医院提醒减少长时间户外活动，校内制冰机和冷藏柜报修量较上周明显增加。", desc: "高温刺激冰饮消费，本轮市场总需求增加 25%。", prompt: "你从哪些细节判断需求会上升？高温同时会不会带来运营风险？", market: 1.25, marketing: 1, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
+  { id: "rainstorm", name: "线下客流收缩", type: "需求", category: "normal", newsCategory: "天气 · 出行", headline: "本市启动防汛Ⅲ级响应，多条公交线路临时绕行", bulletin: "气象部门预计傍晚降雨最强，校方已将两场室外社团活动改为线上，南门步行街部分低洼路段正在设置挡水板。", desc: "强降雨压低到店客流，本轮市场总需求减少 30%。", prompt: "顾客还在，但消费场景发生了什么变化？", market: .70, marketing: 1, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
+  { id: "influencer", name: "传播效率放大", type: "营销", category: "normal", newsCategory: "校园 · 媒体", headline: "校园生活类短视频本周播放量环比增长 160%", bulletin: "学生会发起“发现校园小店”内容征集，平台数据显示带定位的探店内容互动率最高，多家小店开始更新账号和门店照片。", desc: "校园内容进入流量窗口，本轮营销带来的获客效果提高 70%。", prompt: "新闻没有说一定会带来顾客，为什么营销效率仍可能变化？", market: 1.08, marketing: 1.7, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
+  { id: "milk-price", name: "乳品成本传导", type: "供应", category: "black", newsCategory: "气候 · 农业", headline: "北方主要牧区降水量较常年同期偏低四成", bulletin: "当地饲草拍卖均价升至近三年高位，多家规模牧场开始调整奶牛日粮结构。乳企近期密集与上游重新确认第四季度采购排期。", desc: "饲草减产向乳品供应链传导，本轮每杯原料成本增加 ¥1.5。", prompt: "从草场到一杯奶茶，中间经历了怎样的成本传导链？", market: 1, marketing: 1, cost: 1.5, sensitivity: 0, fixed: 0, spoilage: 0 },
+  { id: "price-war", name: "价格竞争加剧", type: "竞争", category: "normal", newsCategory: "商圈 · 招聘", headline: "南门原文具店围挡出现餐饮设备进场记录", bulletin: "施工方透露该铺位将配置制冰、封口与外卖取餐设备。招聘平台同时出现 12 个“饮品店开业储备”兼职岗位，培训期为三天。", desc: "新饮品竞争者进入商圈，消费者对高价更加敏感。", prompt: "哪些信息暗示竞争格局可能变化？降价是不是唯一回应？", market: 1.04, marketing: 1, cost: 0, sensitivity: .035, fixed: 0, spoilage: 0 },
+  { id: "sports-day", name: "场景需求扩张", type: "需求", category: "normal", newsCategory: "校园 · 活动", headline: "校体育场下周延长开放，志愿者排班增至 240 人次", bulletin: "今年院系联赛报名人数创新高，赛事集中在午后进行。后勤处正在协调临时遮阳棚，并增加操场周边垃圾清运频次。", desc: "集中活动扩大即饮消费场景，本轮市场需求增加 35%，营销效率提高 15%。", prompt: "报名人数、时间和后勤安排分别透露了什么需求信号？", market: 1.35, marketing: 1.15, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
+  { id: "power-cut", name: "冷链损耗", type: "运营", category: "black", newsCategory: "基础设施 · 运维", headline: "供电公司将对南门片区进行夜间线路切换", bulletin: "通知称切换时间可能因施工进度延长。商户群里有人询问备用电源租赁，附近便利店已提前转移部分冷藏商品。", desc: "线路切换影响冷藏，本轮已购原料有 25% 无法出售。", prompt: "为什么一条供电通知会影响库存策略，而不只是固定成本？", market: .95, marketing: 1, cost: 0, sensitivity: 0, fixed: 0, spoilage: .25 },
+  { id: "food-rumor", name: "消费信任波动", type: "声誉", category: "black", newsCategory: "社交媒体 · 消费", headline: "本地论坛“现制饮品配料表”话题进入热榜", bulletin: "讨论最初来自一张来源不明的原料桶照片。帖子未点名具体门店，但评论区开始追问糖浆、植脂末和保存日期，相关搜索量持续上升。", desc: "品类信任受到影响，市场需求减少 18%；有效沟通更能修复顾客信心。", prompt: "当舆情没有点名企业时，主动回应还是保持沉默更合理？", market: .82, marketing: 1.45, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 },
+  { id: "plastic-rule", name: "包装合规成本", type: "政策", category: "black", newsCategory: "政策 · 环保", headline: "一次性饮品包装管理意见结束公开征求", bulletin: "行业协会通知会员关注月底发布会。多家包装供应商开始清理旧规格库存，可降解杯盖询价量在三日内快速上升。", desc: "新包装要求落地，本轮每家公司增加 ¥45 合规成本。", prompt: "供应商行为为什么可能比正式文件更早释放政策信号？", market: 1, marketing: 1, cost: 0, sensitivity: 0, fixed: 45, spoilage: 0 },
+  { id: "fruit-logistics", name: "水果供应收紧", type: "供应", category: "black", newsCategory: "物流 · 农业", headline: "南方强对流天气导致两条省际高速间歇封闭", bulletin: "柑橘主产区部分仓库暂停装车，冷链司机群显示平均等待时间已超过 18 小时。批发市场到货档口数量较昨日减少。", desc: "水果与冷链供应趋紧，本轮每杯综合原料成本增加 ¥0.8，市场供应略有收缩。", prompt: "交通信息如何一步步传导到果茶菜单和采购价格？", market: .96, marketing: 1, cost: .8, sensitivity: 0, fixed: 0, spoilage: 0 },
+  { id: "saving-trend", name: "消费趋于谨慎", type: "需求", category: "normal", newsCategory: "校园 · 消费", headline: "校园二手平台交易量创新高，“一周省钱挑战”走红", bulletin: "平台称教材、日用品和餐券转让增幅最大。多个学生社群开始分享月度预算模板，食堂平价套餐搜索次数同步上升。", desc: "学生消费更加谨慎，本轮市场需求减少 5%，并对高价更敏感。", prompt: "宏观的消费情绪会如何影响不同定价路线？", market: .95, marketing: 1, cost: 0, sensitivity: .028, fixed: 0, spoilage: 0 },
+  { id: "night-market", name: "夜间场景增长", type: "机会", category: "normal", newsCategory: "校园 · 社团", headline: "社团联合会新增三晚户外展示时段", bulletin: "首批摊位申请数量超过原计划两倍，舞台节目单延长至 21:30。后勤处要求参与商户自行解决照明和垃圾分类。", desc: "夜间消费场景扩大，本轮市场需求增加 28%，但运营支出增加 ¥15。", prompt: "新增客流和新增运营负担，应该如何同时计入决策？", market: 1.28, marketing: 1.1, cost: 0, sensitivity: 0, fixed: 15, spoilage: 0 },
+  { id: "exam-week", name: "消费场景迁移", type: "需求", category: "normal", newsCategory: "校园 · 教务", headline: "图书馆座位预约开放时间提前至早上六点", bulletin: "期中考试安排集中发布，晚间自习室延长开放。校内运动场预约量下降，外卖平台“送到楼下”备注明显增多。", desc: "线下闲逛型消费减少，本轮市场需求下降 14%，营销效率略有减弱。", prompt: "学生没有消失，但时间和活动半径发生了什么变化？", market: .86, marketing: .9, cost: 0, sensitivity: .012, fixed: 0, spoilage: 0 },
+  { id: "fuel-price", name: "履约成本上升", type: "成本", category: "normal", newsCategory: "能源 · 物流", headline: "成品油价格调整窗口开启，同城配送平台更新计价说明", bulletin: "新说明增加了高峰与远距离附加项。包装批发商通知，小批量订单的免费配送门槛将在下周调整。", desc: "配送与采购履约费用上升，本轮固定成本增加 ¥30，每杯原料成本增加 ¥0.3。", prompt: "为什么能源价格既可能影响固定支出，也可能影响单杯成本？", market: 1, marketing: 1, cost: .3, sensitivity: 0, fixed: 30, spoilage: 0 },
+  { id: "algorithm-shift", name: "线上触达减弱", type: "营销", category: "normal", newsCategory: "平台 · 算法", headline: "本地生活平台调整内容推荐规则", bulletin: "新规则提高长期互动和收藏的权重，单次曝光型内容的自然流量明显波动。多家校园商户反馈昨日发布内容触达低于平时。", desc: "平台规则变化降低短期投放效率，本轮营销效果减少 25%。", prompt: "当渠道规则改变，继续增加同一种营销投入是否合理？", market: 1, marketing: .75, cost: 0, sensitivity: 0, fixed: 0, spoilage: 0 }
 ];
 
 const BUSINESS_KNOWLEDGE = [
@@ -282,6 +288,7 @@ function receiveDecision(token, message) {
 
 function publicSnapshotFor(token) {
   const reveal = teacherState.phase === "settled" || teacherState.phase === "finished";
+  const event = currentEvent();
   const ranked = rankedTeams();
   const team = teacherState.teams.find(item => item.id === token);
   return {
@@ -291,7 +298,8 @@ function publicSnapshotFor(token) {
     totalRounds: teacherState.totalRounds,
     round: teacherState.round,
     phase: teacherState.phase,
-    event: reveal ? currentEvent() : null,
+    news: teacherState.phase === "lobby" ? null : { category: event.newsCategory, headline: event.headline, bulletin: event.bulletin },
+    event: reveal ? event : null,
     marketSize: reveal ? teacherState.marketSize : null,
     teams: ranked.map((item, index) => ({
       id: item.id,
@@ -411,7 +419,7 @@ function phaseCopy() {
   if (!teacherState) return {};
   const missing = teacherState.teams.filter(team => !team.decision).length;
   if (teacherState.phase === "lobby") return { badge: "候场", title: "等待公司入场", desc: "把教室号展示给学生。学生选择“我是学生”后即可加入。", market: "等待开局" };
-  if (teacherState.phase === "deciding") return { badge: "决策中", title: `第 ${teacherState.round} 轮 · 公司决策中`, desc: missing ? `还有 ${missing} 支公司尚未提交。事件对学生保持隐藏。` : "所有公司已提交，可以揭晓事件并统一结算。", market: "事件未揭晓" };
+  if (teacherState.phase === "deciding") return { badge: "研判中", title: `第 ${teacherState.round} 轮 · 新闻研判与决策`, desc: missing ? `商业快讯已同步，还有 ${missing} 支公司正在判断新闻背后的经营影响。` : "所有公司已提交，可以揭示新闻的真实影响并统一结算。", market: "快讯已发布" };
   if (teacherState.phase === "settled") return { badge: "已结算", title: `第 ${teacherState.round} 轮 · 市场已收盘`, desc: `${currentEvent().name} 已揭晓。先用排行榜做一次简短复盘，再进入下一轮。`, market: currentEvent().name };
   return { badge: "已结束", title: "经营赛结束 · 进入课堂复盘", desc: "排行榜已经定格，可导出完整成绩与每轮决策记录。", market: currentEvent().name };
 }
@@ -440,6 +448,7 @@ function renderTeacher() {
     populateEventSelect();
     renderEventPreview();
     const allDone = teacherState.teams.length > 0 && submitted === teacherState.teams.length;
+    dom("eventSelect").disabled = submitted > 0;
     dom("settleButton").disabled = !allDone;
     dom("settleButton").innerHTML = allDone ? `揭晓「${esc(currentEvent().name)}」并结算 <span>→</span>` : `等待提交 · ${submitted}/${teacherState.teams.length}`;
     dom("forceSettleButton").classList.toggle("hidden", submitted === teacherState.teams.length || submitted === 0);
@@ -457,14 +466,16 @@ function renderTeacher() {
 function populateEventSelect() {
   const select = dom("eventSelect");
   if (select.options.length === 0) {
-    select.innerHTML = EVENTS.map(event => `<option value="${event.id}">${event.category === "black" ? "⚡ " : ""}${esc(event.name)} · ${esc(event.type)}</option>`).join("");
+    select.innerHTML = EVENTS.map(event => `<option value="${event.id}">${event.category === "black" ? "深层信号 · " : ""}${esc(event.name)} · ${esc(event.type)}</option>`).join("");
   }
   select.value = teacherState.currentEventId;
 }
 
 function renderEventPreview() {
   const event = currentEvent();
-  dom("teacherEventPreview").innerHTML = `<b>${esc(event.name)} <span>${esc(event.type)}</span></b><p>${esc(event.desc)}</p><small>课堂追问：${esc(event.prompt)}</small>`;
+  dom("teacherEventPreview").innerHTML = `
+    <div class="preview-news"><small>学生看到的快讯 · ${esc(event.newsCategory)}</small><b>${esc(event.headline)}<span>公开信息</span></b><p>${esc(event.bulletin)}</p></div>
+    <div class="teacher-answer"><small>教师底牌 · 结算后揭示</small><strong>${esc(event.name)}</strong><p>${esc(event.desc)}</p><em>课堂追问：${esc(event.prompt)}</em></div>`;
 }
 
 function renderTeacherRoster() {
@@ -599,6 +610,11 @@ function renderStudentDecision(snapshot, me) {
   dom("roundResultPanel").classList.add("hidden");
   dom("decisionTitle").textContent = `第 ${snapshot.round} 轮经营决策`;
   dom("decisionStateTag").textContent = me.decision ? "已提交" : "待提交";
+  if (snapshot.news) {
+    dom("studentNewsCategory").textContent = `${snapshot.news.category} · 今日商业快讯`;
+    dom("studentNewsHeadline").textContent = snapshot.news.headline;
+    dom("studentNewsBody").textContent = `${snapshot.news.bulletin} 请自行判断它可能影响需求、供应、成本、竞争还是运营风险。`;
+  }
   if (studentRenderedRound !== snapshot.round) {
     studentRenderedRound = snapshot.round;
     dom("priceInput").value = "14";
@@ -810,9 +826,11 @@ dom("studentSetup").addEventListener("submit", event => {
 dom("roomCodeInput").addEventListener("input", event => { event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6); });
 dom("eventSelect").addEventListener("change", event => {
   if (teacherState?.phase !== "deciding") return;
+  if (teacherState.teams.some(team => team.decision)) return showToast("已有公司提交，本轮新闻已锁定");
   teacherState.currentEventId = event.target.value;
   saveTeacherState();
   renderEventPreview();
+  broadcastSnapshots();
 });
 ["priceInput", "stockInput", "marketingInput"].forEach(id => dom(id).addEventListener("input", updateDecisionBudget));
 

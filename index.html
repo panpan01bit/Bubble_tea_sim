@@ -7,7 +7,7 @@
   <meta name="description" content="一款为商科体验课设计的多人奶茶经营沙盘：教师开房、学生组队、实时决策与排名。">
   <meta property="og:type" content="website">
   <meta property="og:title" content="奶茶大亨 · 多人商业经营沙盘">
-  <meta property="og:description" content="老师开房、学生组队，在定价、进货、营销与突发事件中经营自己的奶茶公司。">
+  <meta property="og:description" content="老师发布商业快讯，学生研判市场信号，在定价、进货和营销中经营自己的奶茶公司。">
   <meta property="og:image" content="https://panpan01bit.github.io/Bubble_tea_sim/public/og.png">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="奶茶大亨 · 多人商业经营沙盘">
@@ -133,7 +133,7 @@
             <button class="secondary-button" type="button" data-action="add-demo-teams">加入 3 支演示公司</button>
           </div>
           <div id="roundControl" class="hidden">
-            <label class="event-selector">本轮事件（学生结算前不可见）
+            <label class="event-selector">本轮商业新闻（学生可见，结算影响仅教师可见）
               <select id="eventSelect"></select>
             </label>
             <div id="teacherEventPreview" class="event-preview"></div>
@@ -196,7 +196,14 @@
       <div id="studentGame" class="student-game hidden">
         <section class="panel decision-panel">
           <div class="panel-heading"><div><span>YOUR MOVE</span><h2 id="decisionTitle">本轮经营决策</h2></div><span id="decisionStateTag" class="tag pink">待提交</span></div>
-          <div id="mysteryEvent" class="mystery-event"><span>?</span><div><b>市场事件尚未揭晓</b><small>做生意，总要给不确定性留一点余地。</small></div></div>
+          <div id="mysteryEvent" class="mystery-event news-brief">
+            <span>报</span>
+            <div>
+              <small id="studentNewsCategory">今日商业快讯</small>
+              <b id="studentNewsHeadline">市场信息加载中</b>
+              <p id="studentNewsBody">请结合新闻判断需求、供应、成本、竞争或运营风险可能发生的变化。</p>
+            </div>
+          </div>
           <form id="decisionForm">
             <div class="decision-field">
               <div><label for="priceInput">销售定价</label><output id="priceOutput">¥14 / 杯</output></div>
@@ -256,7 +263,7 @@
       <ol class="flow-list">
         <li><span>01</span><div><b>教师创建教室</b><p>系统生成 6 位教室号，无需 localhost 或局域网 IP。</p></div></li>
         <li><span>02</span><div><b>学生组队加入</b><p>每支队伍用一台手机或电脑，输入教室号与公司名。</p></div></li>
-        <li><span>03</span><div><b>决策、事件、结算</b><p>学生提交定价、进货、营销；老师统一揭晓事件并结算。</p></div></li>
+        <li><span>03</span><div><b>新闻研判与决策</b><p>学生从隐晦的商业快讯中推断影响，再提交定价、进货和营销。</p></div></li>
         <li><span>04</span><div><b>排名与复盘</b><p>排行榜实时同步，终局生成经营画像，老师可导出成绩。</p></div></li>
       </ol>
       <div class="callout yellow"><b>网络提示</b><p>所有设备需能访问互联网。校园网络若严格限制 WebRTC，建议提前用教师热点试跑一次。</p></div>
