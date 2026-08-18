@@ -153,6 +153,15 @@
         <section class="panel roster-panel">
           <div class="panel-heading"><div><span>COMPANIES</span><h2>公司席位</h2></div><small id="rosterHint">等待加入</small></div>
           <div id="teacherRoster" class="roster empty-state">还没有公司加入</div>
+          <form id="manualAdjustForm" class="adjust-box hidden">
+            <div class="adjust-label"><i>调</i> 手工调整现金</div>
+            <div class="adjust-row">
+              <select id="adjustTeamSelect" aria-label="选择公司"></select>
+              <input id="adjustAmountInput" type="number" step="10" placeholder="±金额" inputmode="numeric" aria-label="调整金额">
+              <button class="adjust-apply" type="submit">调整</button>
+            </div>
+            <small class="adjust-hint">正数增加、负数减少，直接修改公司现金余额。仅每轮结算后可用。</small>
+          </form>
         </section>
 
         <section class="panel leaderboard-panel">

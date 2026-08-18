@@ -339,3 +339,19 @@ input[type="range"]::-moz-range-thumb { width: 25px; height: 25px; border: 1.5px
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* 手工调整现金（教师端，每轮结算后） */
+.adjust-box { display: grid; gap: 8px; margin-top: 12px; padding: 13px; border: 1.5px solid var(--ink); border-radius: 13px; background: rgba(255,255,255,.66); }
+.adjust-label { display: flex; align-items: center; gap: 8px; font-size: .74rem; font-weight: 900; letter-spacing: .04em; }
+.adjust-label i { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; background: var(--pink); border: 1.5px solid var(--ink); border-radius: 7px; box-shadow: 2px 2px 0 var(--ink); font-style: normal; font-size: .72rem; }
+.adjust-row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto; gap: 7px; }
+.adjust-row select, .adjust-row input { height: 42px; border: 1.5px solid var(--ink); border-radius: 10px; background: #fff; padding: 0 10px; font-weight: 700; font-size: .8rem; outline: none; min-width: 0; }
+.adjust-row input { -moz-appearance: textfield; appearance: textfield; }
+.adjust-row input::-webkit-outer-spin-button, .adjust-row input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.adjust-apply { height: 42px; padding: 0 14px; border: 1.5px solid var(--ink); border-radius: 10px; background: var(--mint); box-shadow: 2px 2px 0 var(--ink); font-weight: 900; font-size: .8rem; cursor: pointer; white-space: nowrap; }
+.adjust-apply:active { transform: translate(2px,2px); box-shadow: 0 0 0 var(--ink); }
+.adjust-hint { font-size: .68rem; opacity: .75; font-weight: 600; }
+@media (max-width: 720px) {
+  .adjust-row { grid-template-columns: 1fr; }
+  .adjust-apply { width: 100%; }
+}

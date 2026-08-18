@@ -459,6 +459,7 @@ function renderTeacher() {
     dom("nextRoundButton").innerHTML = `进入第 ${teacherState.round + 1} 轮 <span>→</span>`;
   }
   renderTeacherRoster();
+  renderManualAdjust();
   renderLeaderboard(dom("teacherLeaderboard"), rankedTeams().map((team, index) => ({ ...team, rank: index + 1, lastProfit: team.lastResult?.profit })));
   renderTeacherLog();
 }
@@ -488,6 +489,33 @@ function renderTeacherRoster() {
       <div><b>${esc(team.name)}</b><span class="connection-label ${(team.connected || team.demo) ? "" : "offline"}"><i></i>${team.demo ? "演示公司" : team.connected ? "在线" : "已掉线"}</span></div>
       <span class="submission-chip ${team.decision ? "done" : ""}">${team.decision ? "已提交" : teacherState.phase === "lobby" ? money(team.cash) : "待提交"}</span>
     </div>`).join("") : "还没有公司加入";
+}
+
+function renderManualAdjust() {
+  const form = dom("manualAdjustForm");
+  const selectable = (teacherState.phase === "settled" || teacherState.phase === "finished") && teacherState.teams.length > 0;
+  form.classList.toggle("hidden", !selectable);
+  if (!selectable) return;
+  const select = dom("adjustTeamSelect");
+  const previous = select.value;
+  select.innerHTML = rankedTeams().map(team => `<option value="${esc(team.id)}">${esc(team.name)} · ${money(team.cash)}</option>`).join("");
+  if (previous && teacherState.teams.some(team => team.id === previous)) select.value = previous;
+}
+
+function applyManualAdjust(amountRaw) {
+  const team = teacherState.teams.find(item => item.id === dom("adjustTeamSelect").value);
+  if (!team) return showToast("请先选择要调整的公司");
+  const amount = Math.round(Number(amountRaw));
+  if (!Number.isFinite(amount) || amount === 0) return showToast("请输入一个非零金额（正数增加、负数减少）");
+  const before = team.cash;
+  team.cash += amount;
+  if (!Array.isArray(team.adjustments)) team.adjustments = [];
+  team.adjustments.push({ round: teacherState.round, amount, cashAfter: team.cash });
+  addTeacherLog(`手工调整 · ${team.name}`, `${money(before)} → ${money(team.cash)}（${amount > 0 ? "+" : ""}${money(amount)}）。`);
+  saveTeacherState();
+  renderTeacher();
+  broadcastSnapshots();
+  showToast(`已调整 ${team.name}：${amount > 0 ? "+" : ""}${money(amount)}`);
 }
 
 function renderTeacherLog() {
@@ -712,10 +740,15 @@ function invitationUrl() {
 
 function downloadResults() {
   const rows = [["最终排名", "公司", "轮次", "事件", "定价", "进货", "营销", "需求", "售出", "损耗", "收入", "成本", "利润", "轮后现金"]];
-  rankedTeams().forEach((team, rankIndex) => team.history.forEach(result => {
-    const event = EVENTS.find(item => item.id === result.eventId);
-    rows.push([rankIndex + 1, team.name, result.round, event?.name || "", result.price, result.stock, result.marketing, result.demand, result.sales, result.waste, result.revenue, result.cost, result.profit, result.cashAfter]);
-  }));
+  rankedTeams().forEach((team, rankIndex) => {
+    team.history.forEach(result => {
+      const event = EVENTS.find(item => item.id === result.eventId);
+      rows.push([rankIndex + 1, team.name, result.round, event?.name || "", result.price, result.stock, result.marketing, result.demand, result.sales, result.waste, result.revenue, result.cost, result.profit, result.cashAfter]);
+    });
+    (team.adjustments || []).forEach(adj => {
+      rows.push([rankIndex + 1, team.name, adj.round, "手工调整", "", "", "", "", "", "", "", "", adj.amount, adj.cashAfter]);
+    });
+  });
   const csv = "\ufeff" + rows.map(row => row.map(csvCell).join(",")).join("\n");
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   const link = document.createElement("a");
@@ -824,6 +857,12 @@ dom("studentSetup").addEventListener("submit", event => {
 });
 
 dom("roomCodeInput").addEventListener("input", event => { event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6); });
+dom("manualAdjustForm").addEventListener("submit", event => {
+  event.preventDefault();
+  if (!teacherState || !["settled", "finished"].includes(teacherState.phase)) return showToast("每轮结算后才能手工调整");
+  applyManualAdjust(dom("adjustAmountInput").value);
+  dom("adjustAmountInput").value = "";
+});
 dom("eventSelect").addEventListener("change", event => {
   if (teacherState?.phase !== "deciding") return;
   if (teacherState.teams.some(team => team.decision)) return showToast("已有公司提交，本轮新闻已锁定");
