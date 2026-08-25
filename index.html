@@ -388,6 +388,51 @@ input[type="range"]::-moz-range-thumb { width: 25px; height: 25px; border: 1.5px
 
   .adjust-apply { width: 100%; }
 }
+
+/* ===== 经营复盘报告（A4 · 每组一页） ===== */
+.rp-overlay { position: fixed; inset: 0; z-index: 90; overflow-y: auto; background: rgba(28,27,25,.58); padding: 22px 0 44px; }
+.rp-toolbar { position: sticky; top: 10px; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; width: min(860px, calc(100% - 32px)); margin: 0 auto 18px; padding: 10px 14px; background: #fff; border: 1.5px solid var(--ink); border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,.3); }
+.rp-toolbar small { display: block; color: var(--muted); margin-top: 2px; }
+.rp-toolbar .primary-button, .rp-toolbar .secondary-button { width: auto; padding: 9px 14px; }
+.rp-page { width: 210mm; min-height: 296mm; margin: 0 auto 18px; padding: 11mm 12mm; background: #fff; color: #1c1b19; display: flex; flex-direction: column; gap: 3.2mm; box-shadow: 0 8px 28px rgba(0,0,0,.32); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.rp-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 8mm; border-bottom: 2.5px solid #1c1b19; padding-bottom: 2.4mm; }
+.rp-brand { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 13px; letter-spacing: .5px; }
+.rp-brand i { width: 24px; height: 24px; border-radius: 7px; background: #1c1b19; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-style: normal; font-size: 12px; }
+.rp-head-meta { text-align: right; font-size: 9.5px; line-height: 1.5; color: #55504a; }
+.rp-title { font-size: 21px; font-weight: 800; line-height: 1.2; }
+.rp-title small { display: block; font-size: 10px; font-weight: 600; color: #8a8478; margin-top: 1mm; }
+.rp-kpis { display: grid; grid-template-columns: repeat(6, 1fr); border: 1.5px solid #1c1b19; border-radius: 8px; overflow: hidden; }
+.rp-kpi { padding: 2mm 2mm 1.8mm; border-right: 1px solid #ddd8cc; min-width: 0; }
+.rp-kpi:last-child { border-right: 0; }
+.rp-kpi span { display: block; font-size: 8.5px; color: #8a8478; margin-bottom: 1mm; white-space: nowrap; }
+.rp-kpi b { font-size: 13px; white-space: nowrap; }
+.rp-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; }
+.rp-card { border: 1.5px solid #1c1b19; border-radius: 8px; padding: 2.2mm 2.6mm 2mm; background: #fff; }
+.rp-card h3 { font-size: 10.5px; display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.2mm; }
+.rp-card h3 small { color: #8a8478; font-weight: 600; font-size: 8.5px; }
+.rp-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+.rp-table th, .rp-table td { border: 1px solid #d8d3c7; padding: 1.3mm 1.5mm; text-align: right; white-space: nowrap; }
+.rp-table th { background: #f4f1e9; color: #55504a; font-size: 8.5px; }
+.rp-table td:first-child, .rp-table th:first-child { text-align: left; }
+.rp-table .left { text-align: left; white-space: normal; }
+.rp-neg { color: #dc2626; }
+.rp-pos { color: #047857; }
+.rp-legend { display: flex; gap: 10px; flex-wrap: wrap; font-size: 8.5px; color: #55504a; margin: .4mm 0 1mm; }
+.rp-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2.5px; margin-right: 3px; vertical-align: -1px; }
+.rp-events { list-style: none; font-size: 9px; line-height: 1.55; }
+.rp-events li { display: flex; gap: 2mm; margin-bottom: 1mm; }
+.rp-events b { flex: none; color: #1c1b19; }
+.rp-events span { color: #55504a; }
+.rp-foot { margin-top: auto; display: flex; justify-content: space-between; font-size: 8.5px; color: #8a8478; border-top: 1px solid #ddd8cc; padding-top: 1.6mm; }
+@page { size: A4; margin: 0; }
+@media print {
+  body { background: #fff; }
+  body > *:not(.rp-overlay) { display: none !important; }
+  .rp-overlay { position: static; padding: 0; overflow: visible; background: #fff; }
+  .rp-toolbar { display: none; }
+  .rp-page { margin: 0; box-shadow: none; height: 296mm; overflow: hidden; page-break-after: always; }
+  .rp-page:last-child { page-break-after: auto; }
+}
 </style>
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 </head>
@@ -519,7 +564,8 @@ input[type="range"]::-moz-range-thumb { width: 25px; height: 25px; border: 1.5px
           </div>
           <div id="finishedControl" class="hidden">
             <div class="callout yellow"><b>经营赛已结束</b><p>请结合决策记录，引导学生解释“为什么赢”和“为什么亏”。</p></div>
-            <button class="primary-button" type="button" data-action="download-results">导出课堂成绩 CSV <span>↓</span></button>
+            <button class="primary-button" type="button" data-action="download-report">导出复盘报告 A4（每组一页 · 图表） <span>↓</span></button>
+            <button class="secondary-button" type="button" data-action="download-results">导出课堂成绩 CSV <span>↓</span></button>
           </div>
         </section>
 
@@ -1481,6 +1527,259 @@ function csvCell(value) {
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
+/* ===== 经营复盘报告（A4 · 每组一页，供 PPT 复盘） ===== */
+const REPORT_COLORS = ["#2563eb", "#059669", "#d97706", "#dc2626", "#7c3aed", "#0891b2", "#db2777", "#65a30d"];
+
+function reportRoundData() {
+  const rounds = new Map();
+  teacherState.teams.forEach(team => (team.history || []).forEach(row => {
+    if (!rounds.has(row.round)) rounds.set(row.round, { round: row.round, eventId: row.eventId, totalDemand: 0, totalSales: 0 });
+    const item = rounds.get(row.round);
+    item.totalDemand += row.demand;
+    item.totalSales += row.sales;
+  }));
+  return [...rounds.values()].sort((a, b) => a.round - b.round);
+}
+
+function reportEventOf(eventId) {
+  return EVENTS.find(event => event.id === eventId) || { name: "—", type: "", desc: "" };
+}
+
+function reportCashRanks(round) {
+  const scored = teacherState.teams
+    .map(team => ({ id: team.id, cash: (team.history || []).find(row => row.round === round)?.cashAfter ?? -Infinity }))
+    .sort((a, b) => b.cash - a.cash);
+  return new Map(scored.map((item, index) => [item.id, index + 1]));
+}
+
+function reportCompact(value) {
+  return Math.abs(value) >= 1000 ? `${(value / 1000).toFixed(Math.abs(value) >= 10000 ? 0 : 1)}k` : String(Math.round(value));
+}
+
+function reportSvgLine({ values, labels, color = "#1c1b19", width = 340, height = 150, invert = false, pointFormat = null, tickFormat = reportCompact }) {
+  if (!values.length) return "";
+  const padL = 38, padR = 10, padT = 16, padB = 17;
+  let min = Math.min(...values), max = Math.max(...values);
+  if (invert) { min -= .4; max += .4; } else { min = Math.min(0, min); }
+  if (max === min) max = min + 1;
+  const innerW = width - padL - padR, innerH = height - padT - padB;
+  const px = i => padL + (values.length > 1 ? (i * innerW) / (values.length - 1) : innerW / 2);
+  const py = v => padT + ((invert ? v - min : max - v) / (max - min)) * innerH;
+  const points = values.map((v, i) => `${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ");
+  const ticks = [max, (max + min) / 2, min];
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-hidden="true">
+    ${ticks.map(v => `<line x1="${padL}" y1="${py(v).toFixed(1)}" x2="${width - padR}" y2="${py(v).toFixed(1)}" stroke="#e5e1d8" stroke-width="1"/>`).join("")}
+    ${ticks.map(v => `<text x="${padL - 5}" y="${(py(v) + 3).toFixed(1)}" text-anchor="end" font-size="8.5" fill="#8a8478">${tickFormat(v)}</text>`).join("")}
+    <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+    ${values.map((v, i) => `<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="3.2" fill="${color}"/>`).join("")}
+    ${pointFormat ? values.map((v, i) => {
+      const above = py(v) - 7 >= padT;
+      return `<text x="${px(i).toFixed(1)}" y="${(above ? py(v) - 7 : py(v) + 13).toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="700" fill="${color}">${pointFormat(v)}</text>`;
+    }).join("") : ""}
+    ${labels.map((label, i) => `<text x="${px(i).toFixed(1)}" y="${height - 4}" text-anchor="middle" font-size="8.5" fill="#8a8478">${esc(label)}</text>`).join("")}
+  </svg>`;
+}
+
+function reportSvgBars({ labels, series, width = 340, height = 150 }) {
+  const groups = labels.length;
+  if (!groups) return "";
+  const padL = 38, padR = 8, padT = 10, padB = 17;
+  const max = Math.max(1, ...series.flatMap(item => item.values));
+  const innerW = width - padL - padR, innerH = height - padT - padB;
+  const groupW = innerW / groups;
+  const barW = Math.max(5, Math.min(15, (groupW * 0.72) / series.length));
+  const y = v => padT + (1 - v / max) * innerH;
+  const bars = series.map((item, si) => item.values.map((v, gi) => {
+    const cx = padL + gi * groupW + groupW / 2 + (si - (series.length - 1) / 2) * (barW + 1.5);
+    const top = y(Math.max(0, v));
+    const base = y(0);
+    return `<rect x="${(cx - barW / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1, base - top).toFixed(1)}" rx="1.5" fill="${item.color}"/>`;
+  }).join("")).join("");
+  const ticks = [max, max / 2, 0];
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-hidden="true">
+    ${ticks.map(v => `<line x1="${padL}" y1="${y(v).toFixed(1)}" x2="${width - padR}" y2="${y(v).toFixed(1)}" stroke="#e5e1d8" stroke-width="1"/>`).join("")}
+    ${ticks.map(v => `<text x="${padL - 5}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end" font-size="8.5" fill="#8a8478">${reportCompact(v)}</text>`).join("")}
+    ${bars}
+    ${labels.map((label, gi) => `<text x="${(padL + gi * groupW + groupW / 2).toFixed(1)}" y="${height - 4}" text-anchor="middle" font-size="8.5" fill="#8a8478">${esc(label)}</text>`).join("")}
+  </svg>`;
+}
+
+function reportSvgMultiLine({ series, labels, width = 700, height = 168 }) {
+  const all = series.flatMap(item => item.values);
+  if (!all.length) return "";
+  const padL = 42, padR = 12, padT = 10, padB = 17;
+  let min = Math.min(0, ...all), max = Math.max(...all);
+  if (max === min) max = min + 1;
+  const innerW = width - padL - padR, innerH = height - padT - padB;
+  const count = Math.max(...series.map(item => item.values.length));
+  const px = i => padL + (count > 1 ? (i * innerW) / (count - 1) : innerW / 2);
+  const py = v => padT + ((max - v) / (max - min)) * innerH;
+  const ticks = [max, (max + min) / 2, min];
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" role="img" aria-hidden="true">
+    ${ticks.map(v => `<line x1="${padL}" y1="${py(v).toFixed(1)}" x2="${width - padR}" y2="${py(v).toFixed(1)}" stroke="#e5e1d8" stroke-width="1"/>`).join("")}
+    ${ticks.map(v => `<text x="${padL - 5}" y="${(py(v) + 3).toFixed(1)}" text-anchor="end" font-size="8.5" fill="#8a8478">${reportCompact(v)}</text>`).join("")}
+    ${series.map(item => {
+      const points = item.values.map((v, i) => `${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ");
+      return `<polyline points="${points}" fill="none" stroke="${item.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    }).join("")}
+    ${series.map(item => item.values.map((v, i) => `<circle cx="${px(i).toFixed(1)}" cy="${py(v).toFixed(1)}" r="2.4" fill="${item.color}"/>`).join("")).join("")}
+    ${labels.map((label, i) => `<text x="${px(i).toFixed(1)}" y="${height - 4}" text-anchor="middle" font-size="8.5" fill="#8a8478">${esc(label)}</text>`).join("")}
+  </svg>`;
+}
+
+function reportLegend(items) {
+  return `<div class="rp-legend">${items.map(item => `<span><i style="background:${item.color}"></i>${esc(item.name)}</span>`).join("")}</div>`;
+}
+
+function reportPageHead(subtitle) {
+  return `<header class="rp-head">
+    <div class="rp-brand"><i>茶</i>奶茶大亨 · BUSINESS LAB</div>
+    <div class="rp-head-meta">${esc(teacherState.className)} · 教室号 ${esc(teacherState.roomCode)}<br>共 ${teacherState.totalRounds} 轮 · ${new Date().toLocaleDateString("zh-CN")} 导出</div>
+  </header>
+  <div class="rp-title">${esc(subtitle)}<small>经营复盘报告 · 课堂 PPT 素材</small></div>`;
+}
+
+function reportKpis(items) {
+  return `<div class="rp-kpis">${items.map(item => `<div class="rp-kpi"><span>${esc(item.label)}</span><b class="${item.negative ? "rp-neg" : ""}">${esc(item.value)}</b></div>`).join("")}</div>`;
+}
+
+function reportFoot(note) {
+  return `<footer class="rp-foot"><span>${esc(note)}</span><span>奶茶大亨 · 课堂经营沙盘</span></footer>`;
+}
+
+function reportOverviewPage(marketRounds, labels) {
+  const ranked = rankedTeams();
+  const playedRounds = marketRounds.length;
+  const teamSeries = ranked.map((team, index) => ({
+    name: team.name, color: REPORT_COLORS[index % REPORT_COLORS.length],
+    values: [TOTAL_START_CASH, ...(team.history || []).map(row => row.cashAfter)]
+  }));
+  const classProfit = ranked.reduce((sum, team) => sum + (team.history || []).reduce((s, row) => s + row.profit, 0), 0);
+  const boardRows = ranked.map((team, index) => {
+    const history = team.history || [];
+    const revenue = history.reduce((s, row) => s + row.revenue, 0);
+    const cost = history.reduce((s, row) => s + row.cost, 0);
+    const profit = history.reduce((s, row) => s + row.profit, 0);
+    return `<tr><td>${index + 1}</td><td class="left">${esc(team.name)}</td><td>${money(revenue)}</td><td>${money(cost)}</td><td class="${profit < 0 ? "rp-neg" : "rp-pos"}">${profit >= 0 ? "+" : ""}${money(profit)}</td><td><b>${money(team.cash)}</b></td></tr>`;
+  }).join("");
+  const eventRows = marketRounds.map(item => {
+    const event = reportEventOf(item.eventId);
+    return `<tr><td>第 ${item.round} 轮</td><td class="left">${esc(event.name)}</td><td>${esc(event.type)}</td><td class="left">${esc(event.desc)}</td></tr>`;
+  }).join("");
+  return `<section class="rp-page">
+    ${reportPageHead("经营赛总览 · 市场与排行")}
+    ${reportKpis([
+      { label: "参赛公司", value: `${ranked.length} 支` },
+      { label: "完成轮数", value: `${playedRounds} 轮` },
+      { label: "总冠军", value: ranked.length ? ranked[0].name : "—" },
+      { label: "冠军现金", value: ranked.length ? money(ranked[0].cash) : "—" },
+      { label: "全班总利润", value: (classProfit >= 0 ? "+" : "") + money(classProfit), negative: classProfit < 0 },
+      { label: "市场事件", value: `${marketRounds.length} 次` }
+    ])}
+    <div class="rp-grid2">
+      <div class="rp-card"><h3>全市场总需求走势 <small>杯 · 各轮合计</small></h3>${reportSvgLine({ values: marketRounds.map(item => item.totalDemand), labels, color: "#1c1b19", pointFormat: v => String(Math.round(v)) })}</div>
+      <div class="rp-card"><h3>各公司期末现金走势 <small>¥ · 含开局 ¥1,000</small></h3>${reportSvgMultiLine({ series: teamSeries, labels: ["开局", ...labels] })}${reportLegend(teamSeries.map(item => ({ name: item.name, color: item.color })))}</div>
+    </div>
+    <div class="rp-card"><h3>最终排行榜 <small>按现金余额</small></h3>
+      <table class="rp-table"><tr><th>排名</th><th>公司</th><th>总营收</th><th>总成本</th><th>总利润</th><th>期末现金</th></tr>${boardRows}</table>
+    </div>
+    <div class="rp-card"><h3>逐轮突发事件与市场影响 <small>教师视角</small></h3>
+      <table class="rp-table"><tr><th>轮次</th><th>事件</th><th>类型</th><th>影响摘要</th></tr>${eventRows}</table>
+    </div>
+    ${reportFoot(`总览页 · 后续每组一页，共 ${ranked.length + 1} 页`)}
+  </section>`;
+}
+
+function reportTeamPage(team, finalRank, marketRounds, labels) {
+  const history = team.history || [];
+  const playedLabels = history.map(row => `R${row.round}`);
+  const cashValues = [TOTAL_START_CASH, ...history.map(row => row.cashAfter)];
+  const totalRevenue = history.reduce((s, row) => s + row.revenue, 0);
+  const totalCost = history.reduce((s, row) => s + row.cost, 0);
+  const totalProfit = history.reduce((s, row) => s + row.profit, 0);
+  const totalWaste = history.reduce((s, row) => s + row.waste, 0);
+  const totalDemandGot = history.reduce((s, row) => s + row.demand, 0);
+  const totalSales = history.reduce((s, row) => s + row.sales, 0);
+  const ranks = history.map(row => reportCashRanks(row.round).get(team.id)).filter(value => value != null);
+  const bestRank = ranks.length ? Math.min(...ranks) : "—";
+  const detailRows = history.map(row => {
+    const market = marketRounds.find(item => item.round === row.round);
+    const event = reportEventOf(row.eventId);
+    const share = market && market.totalDemand ? `${Math.round((row.demand / market.totalDemand) * 100)}%` : "—";
+    const rank = reportCashRanks(row.round).get(team.id);
+    return `<tr><td>第 ${row.round} 轮</td><td class="left">${esc(event.name)}</td><td>${market ? market.totalDemand : "—"}</td><td>${share}</td><td>¥${row.price}</td><td>${row.demand} / ${row.sales}</td><td>${money(row.revenue)}</td><td>${money(row.cost)}</td><td class="${row.profit < 0 ? "rp-neg" : "rp-pos"}">${row.profit >= 0 ? "+" : ""}${money(row.profit)}</td><td>${money(row.cashAfter)}</td><td>第 ${rank ?? "—"} 名</td></tr>`;
+  }).join("");
+  const eventNotes = history.map(row => {
+    const event = reportEventOf(row.eventId);
+    return `<li><b>R${row.round} · ${esc(event.name)}</b><span>${esc(event.desc)}</span></li>`;
+  }).join("");
+  return `<section class="rp-page">
+    ${reportPageHead(`${team.name} · 经营复盘`)}
+    ${reportKpis([
+      { label: "最终排名", value: `第 ${finalRank} 名` },
+      { label: "期末现金", value: money(team.cash) },
+      { label: "总营收", value: money(totalRevenue) },
+      { label: "总成本", value: money(totalCost) },
+      { label: "总利润", value: (totalProfit >= 0 ? "+" : "") + money(totalProfit), negative: totalProfit < 0 },
+      { label: "历史最佳位次", value: ranks.length ? `第 ${bestRank} 名` : "—" }
+    ])}
+    <div class="rp-grid2">
+      <div class="rp-card"><h3>现金流走势 <small>期末现金 ¥</small></h3>${reportSvgLine({ values: cashValues, labels: ["开局", ...playedLabels], color: "#2563eb", pointFormat: v => reportCompact(v) })}</div>
+      <div class="rp-card"><h3>营收 · 成本 · 利润 <small>逐轮对比 ¥</small></h3>${reportLegend([{ name: "营收", color: "#2563eb" }, { name: "成本", color: "#d97706" }, { name: "利润", color: "#059669" }])}${reportSvgBars({ labels: playedLabels, series: [
+        { color: "#2563eb", values: history.map(row => row.revenue) },
+        { color: "#d97706", values: history.map(row => row.cost) },
+        { color: "#059669", values: history.map(row => Math.max(0, row.profit)) }
+      ] })}</div>
+    </div>
+    <div class="rp-grid2">
+      <div class="rp-card"><h3>位次变化 <small>按期末现金 · 1 为最高</small></h3>${ranks.length ? reportSvgLine({ values: ranks, labels: playedLabels, color: "#7c3aed", invert: true, pointFormat: v => `第${v}`, tickFormat: v => `第${Math.round(v)}` }) : "<p style='font-size:9px;color:#8a8478;padding:8px 0'>暂无位次数据</p>"}</div>
+      <div class="rp-card"><h3>顾客需求 vs 实际销量 <small>杯 · 差额为损耗/缺货</small></h3>${reportLegend([{ name: "顾客需求", color: "#0891b2" }, { name: "实际销量", color: "#65a30d" }])}${reportSvgBars({ labels: playedLabels, series: [
+        { color: "#0891b2", values: history.map(row => row.demand) },
+        { color: "#65a30d", values: history.map(row => row.sales) }
+      ] })}</div>
+    </div>
+    <div class="rp-card"><h3>逐轮经营明细 <small>市场 · 决策 · 结果</small></h3>
+      <table class="rp-table"><tr><th>轮次</th><th>突发事件</th><th>市场需求</th><th>份额</th><th>定价</th><th>需求/销量</th><th>营收</th><th>成本</th><th>利润</th><th>期末现金</th><th>位次</th></tr>${detailRows}</table>
+    </div>
+    <div class="rp-card"><h3>突发事件影响要点 <small>结算后公开的真实影响</small></h3><ul class="rp-events">${eventNotes}</ul></div>
+    ${reportFoot(`${team.name} · 累计需求 ${totalDemandGot} 杯 / 售出 ${totalSales} 杯 / 报废 ${totalWaste} 杯`)}
+  </section>`;
+}
+
+function buildReviewReportHtml() {
+  const marketRounds = reportRoundData();
+  const labels = marketRounds.map(item => `R${item.round}`);
+  const ranked = rankedTeams();
+  return `
+  <div class="rp-toolbar">
+    <div><b>经营复盘报告 · A4</b><small>${esc(teacherState.className)} · 教室号 ${esc(teacherState.roomCode)} · 共 ${ranked.length + 1} 页（1 页总览 + 每组 1 页）。打印时选择「存储为 PDF」，纸张 A4、无边距。</small></div>
+    <div style="display:flex;gap:8px">
+      <button class="primary-button" type="button" data-report-print>打印 / 存为 PDF <span>↓</span></button>
+      <button class="secondary-button" type="button" data-report-close>关闭</button>
+    </div>
+  </div>
+  ${reportOverviewPage(marketRounds, labels)}
+  ${ranked.map((team, index) => reportTeamPage(team, index + 1, marketRounds, labels)).join("")}`;
+}
+
+function openReviewReport() {
+  if (!teacherState) return;
+  if (!teacherState.teams.some(team => (team.history || []).length)) return showToast("至少完成一轮经营结算后才能导出复盘报告");
+  closeReviewReport();
+  const overlay = document.createElement("div");
+  overlay.id = "reviewReportOverlay";
+  overlay.className = "rp-overlay";
+  overlay.innerHTML = buildReviewReportHtml();
+  document.body.appendChild(overlay);
+  overlay.querySelector("[data-report-print]").addEventListener("click", () => window.print());
+  overlay.querySelector("[data-report-close]").addEventListener("click", closeReviewReport);
+  window.scrollTo({ top: 0 });
+}
+
+function closeReviewReport() {
+  document.getElementById("reviewReportOverlay")?.remove();
+}
+
 function exitRoom() {
   if (!window.confirm("确定退出当前教室吗？当前设备上的页面连接会断开。")) return;
   intentionalExit = true;
@@ -1513,6 +1812,7 @@ function handleAction(action) {
   }
   if (action === "next-round" && teacherState?.phase === "settled") startRound();
   if (action === "download-results") downloadResults();
+  if (action === "download-report") openReviewReport();
   if (action === "add-demo-teams") addDemoTeams();
   if (action === "resume-room") resumeRoom();
   if (action === "open-knowledge") openKnowledge();
@@ -1551,7 +1851,9 @@ document.addEventListener("click", event => {
 });
 
 document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && !dom("knowledgeModal").classList.contains("hidden")) closeKnowledge();
+  if (event.key !== "Escape") return;
+  if (!dom("knowledgeModal").classList.contains("hidden")) closeKnowledge();
+  else if (document.getElementById("reviewReportOverlay")) closeReviewReport();
 });
 
 dom("teacherSetup").addEventListener("submit", event => {
