@@ -390,6 +390,295 @@ input[type="range"]::-moz-range-thumb { width: 25px; height: 25px; border: 1.5px
 }
 </style>
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <section id="welcomeView" class="welcome-view">
+    <nav class="landing-nav" aria-label="主导航">
+      <a class="brand" href="./" aria-label="奶茶大亨首页">
+        <span class="brand-mark" aria-hidden="true">茶</span>
+        <span><b>奶茶大亨</b><small>BUSINESS LAB</small></span>
+      </a>
+      <button class="text-button" type="button" data-action="show-guide">怎么玩？</button>
+    </nav>
+
+    <main class="landing-main">
+      <div class="hero-copy">
+        <span class="eyebrow"><i></i> 商科体验课 · 多人实时沙盘</span>
+        <h1>把一间教室，<br>变成一条<span>商业街。</span></h1>
+        <p>老师掌控市场，学生经营公司。定价、备货、营销，每一个选择都会改变排行榜。</p>
+        <div class="feature-row" aria-label="产品特点">
+          <span>无需安装</span><span>手机可玩</span><span>4–6 人一队</span>
+        </div>
+      </div>
+
+      <div class="entry-card">
+        <div id="roleStep">
+          <div class="step-label">01 / 选择你的身份</div>
+          <h2>今天你是谁？</h2>
+          <button class="role-card teacher" type="button" data-role="teacher">
+            <span class="role-icon">控</span>
+            <span><b>我是教师</b><small>创建教室 · 控制回合 · 点评复盘</small></span>
+            <em>→</em>
+          </button>
+          <button class="role-card student" type="button" data-role="student">
+            <span class="role-icon">创</span>
+            <span><b>我是学生</b><small>加入教室 · 创建公司 · 提交决策</small></span>
+            <em>→</em>
+          </button>
+        </div>
+
+        <form id="teacherSetup" class="setup-form hidden">
+          <button class="back-button" type="button" data-action="back-role">← 返回选择</button>
+          <div class="step-label">02 / 创建教室</div>
+          <h2>设置本次经营赛</h2>
+          <label>教室名称
+            <input id="classNameInput" maxlength="24" value="商科体验课 A 班" autocomplete="off">
+          </label>
+          <label>经营轮数
+            <select id="roundCountInput">
+              <option value="4">4 轮 · 约 45 分钟</option>
+              <option value="5">5 轮 · 约 60 分钟</option>
+              <option value="6">6 轮 · 约 75 分钟</option>
+            </select>
+          </label>
+          <button class="primary-button" type="submit">创建教室 <span>→</span></button>
+          <button id="resumeButton" class="secondary-button hidden" type="button" data-action="resume-room">恢复上次未结束的教室</button>
+        </form>
+
+        <form id="studentSetup" class="setup-form hidden">
+          <button class="back-button" type="button" data-action="back-role">← 返回选择</button>
+          <div class="step-label">02 / 加入教室</div>
+          <h2>创建你的公司</h2>
+          <label>6 位教室号
+            <input id="roomCodeInput" class="code-input" maxlength="6" placeholder="例如 8K3M2P" autocomplete="off" autocapitalize="characters">
+          </label>
+          <label>公司名称
+            <input id="companyNameInput" maxlength="14" placeholder="例如：珍珠突击队" autocomplete="organization">
+          </label>
+          <button id="joinButton" class="primary-button" type="submit">加入教室 <span>→</span></button>
+          <p id="joinHint" class="form-hint">请向老师获取教室号。每支队伍使用一台设备提交决策。</p>
+        </form>
+      </div>
+    </main>
+
+  </section>
+
+  <div id="teacherView" class="app-view hidden">
+    <header class="app-header">
+      <a class="brand compact" href="./"><span class="brand-mark">茶</span><span><b>奶茶大亨</b><small>教师控制台</small></span></a>
+      <div class="header-actions">
+        <span id="teacherNetBadge" class="status-pill"><i></i> 正在创建教室</span>
+        <button class="outline-button small" type="button" data-action="copy-room">复制邀请</button>
+        <button class="icon-button" type="button" data-action="leave-room" aria-label="退出教室">退出</button>
+      </div>
+    </header>
+
+    <main class="dashboard teacher-dashboard">
+      <section class="control-hero">
+        <div>
+          <span class="eyebrow dark"><i></i> <span id="teacherClassName">—</span></span>
+          <div class="room-line"><span>教室号</span><strong id="teacherRoomCode" class="mono">------</strong><button type="button" data-action="copy-code">复制</button></div>
+          <h1 id="teacherStageTitle">等待公司入场</h1>
+          <p id="teacherStageDesc">把教室号展示给学生。学生选择“我是学生”后即可加入。</p>
+        </div>
+        <div class="round-orbit" aria-label="回合进度">
+          <span>ROUND</span><strong id="teacherRoundBig">0</strong><small id="teacherRoundTotal">/ 4</small>
+        </div>
+      </section>
+
+      <section class="metric-strip">
+        <div><span>已加入公司</span><strong id="teamCount">0</strong></div>
+        <div><span>本轮已提交</span><strong id="submitCount">0 / 0</strong></div>
+        <div><span>市场状态</span><strong id="marketStatus">等待开局</strong></div>
+        <div><span>连接方式</span><strong>浏览器直连</strong></div>
+      </section>
+
+      <div class="teacher-grid">
+        <section class="panel teacher-control">
+          <div class="panel-heading"><div><span>CONTROL</span><h2>课堂控制</h2></div><span id="phaseBadge" class="tag">候场</span></div>
+          <div id="lobbyControl">
+            <div class="callout mint"><b>开局前检查</b><p>确认所有公司已入场。开始后仍可允许掉线队伍以原名称重连。</p></div>
+            <button id="startGameButton" class="primary-button" type="button" data-action="start-game">开始第 1 轮 <span>→</span></button>
+            <button class="secondary-button" type="button" data-action="add-demo-teams">加入 3 支演示公司</button>
+          </div>
+          <div id="roundControl" class="hidden">
+            <label class="event-selector">本轮商业新闻（学生可见，结算影响仅教师可见）
+              <select id="eventSelect"></select>
+            </label>
+            <div id="teacherEventPreview" class="event-preview"></div>
+            <button id="settleButton" class="primary-button" type="button" data-action="settle-round">等待所有公司提交</button>
+            <button id="forceSettleButton" class="text-button danger hidden" type="button" data-action="force-settle">按当前提交强制结算</button>
+          </div>
+          <div id="settledControl" class="hidden">
+            <div id="teacherRoundSummary" class="round-summary"></div>
+            <button id="nextRoundButton" class="primary-button" type="button" data-action="next-round">进入下一轮 <span>→</span></button>
+          </div>
+          <div id="finishedControl" class="hidden">
+            <div class="callout yellow"><b>经营赛已结束</b><p>请结合决策记录，引导学生解释“为什么赢”和“为什么亏”。</p></div>
+            <button class="primary-button" type="button" data-action="download-results">导出课堂成绩 CSV <span>↓</span></button>
+          </div>
+        </section>
+
+        <section class="panel roster-panel">
+          <div class="panel-heading"><div><span>COMPANIES</span><h2>公司席位</h2></div><small id="rosterHint">等待加入</small></div>
+          <div id="teacherRoster" class="roster empty-state">还没有公司加入</div>
+          <form id="manualAdjustForm" class="adjust-box hidden">
+            <div class="adjust-label"><i>调</i> 手工调整现金</div>
+            <div class="adjust-row adjust-mode-row">
+              <label class="adjust-radio"><input type="radio" name="adjustMode" value="amount" checked><span>固定金额</span></label>
+              <label class="adjust-radio"><input type="radio" name="adjustMode" value="percent"><span>当轮营收百分比</span></label>
+            </div>
+            <div class="adjust-row">
+              <select id="adjustTeamSelect" aria-label="选择公司"></select>
+              <input id="adjustAmountInput" type="number" step="10" placeholder="±金额" inputmode="numeric" aria-label="调整金额">
+              <button class="adjust-apply" type="submit">调整</button>
+            </div>
+            <small id="adjustHint" class="adjust-hint">正数增加、负数减少，直接修改公司现金余额。仅每轮结算后可用。</small>
+          </form>
+        </section>
+
+        <section class="panel leaderboard-panel">
+          <div class="panel-heading"><div><span>LIVE BOARD</span><h2>实时龙虎榜</h2></div><small>按现金余额排名</small></div>
+          <div id="teacherLeaderboard" class="leaderboard empty-state">开局后显示实时排名</div>
+        </section>
+
+        <section class="panel log-panel">
+          <div class="panel-heading"><div><span>TEACHING FEED</span><h2>课堂动态</h2></div><small>仅教师可见</small></div>
+          <div id="teacherLog" class="activity-log"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="studentView" class="app-view hidden">
+    <header class="app-header student-header">
+      <a class="brand compact" href="./"><span class="brand-mark">茶</span><span><b id="studentCompanyHeader">我的公司</b><small id="studentClassHeader">正在连接</small></span></a>
+      <div class="header-actions">
+        <button class="knowledge-button" type="button" data-action="open-knowledge" aria-haspopup="dialog"><span>知</span> 商科知识</button>
+        <span id="studentNetBadge" class="status-pill"><i></i> 连接中</span>
+        <button class="icon-button" type="button" data-action="leave-room">退出</button>
+      </div>
+    </header>
+
+    <main class="dashboard student-dashboard">
+      <section class="student-hud">
+        <div><span>当前回合</span><strong id="studentRound">—</strong></div>
+        <div class="cash"><span>公司现金</span><strong id="studentCash">¥1,000</strong></div>
+        <div><span>实时排名</span><strong id="studentRank">—</strong></div>
+        <div><span>教室号</span><strong id="studentRoom" class="mono">------</strong></div>
+      </section>
+
+      <section id="studentWaiting" class="waiting-stage">
+        <div class="waiting-art" aria-hidden="true"><span></span><span></span><span></span></div>
+        <span class="eyebrow dark"><i></i> 已成功入场</span>
+        <h1>公司已挂牌，等待老师开市</h1>
+        <p>可以先和队友商量：你们想走低价规模路线，还是高端品牌路线？</p>
+      </section>
+
+      <div id="studentGame" class="student-game hidden">
+        <section class="panel decision-panel">
+          <div class="panel-heading"><div><span>YOUR MOVE</span><h2 id="decisionTitle">本轮经营决策</h2></div><span id="decisionStateTag" class="tag pink">待提交</span></div>
+          <div id="mysteryEvent" class="mystery-event news-brief">
+            <span>报</span>
+            <div>
+              <small id="studentNewsCategory">今日商业快讯</small>
+              <b id="studentNewsHeadline">市场信息加载中</b>
+              <p id="studentNewsBody">请结合新闻判断需求、供应、成本、竞争或运营风险可能发生的变化。</p>
+            </div>
+          </div>
+          <form id="decisionForm">
+            <div class="decision-field">
+              <div><label for="priceInput">销售定价</label><output id="priceOutput">¥14 / 杯</output></div>
+              <p>价高利润厚，但可能把顾客推向竞争对手。</p>
+              <input id="priceInput" type="range" min="8" max="24" step="1" value="14">
+              <div class="range-labels"><span>走量 ¥8</span><span>均衡 ¥14</span><span>高端 ¥24</span></div>
+            </div>
+            <div class="decision-field">
+              <div><label for="stockInput">原料进货</label><output id="stockOutput">90 杯</output></div>
+              <p>基础成本 ¥4 / 杯。鲜奶不能留到下一轮。</p>
+              <input id="stockInput" type="range" min="0" max="200" step="10" value="90">
+              <div class="range-labels"><span>保守 0</span><span>稳健 100</span><span>激进 200</span></div>
+            </div>
+            <div class="decision-field">
+              <div><label for="marketingInput">营销投入</label><output id="marketingOutput">¥60</output></div>
+              <p>营销会提升客流吸引力，但效果存在边际递减。</p>
+              <input id="marketingInput" type="range" min="0" max="200" step="10" value="60">
+              <div class="range-labels"><span>不投 ¥0</span><span>适度 ¥100</span><span>猛攻 ¥200</span></div>
+            </div>
+            <div class="budget-box">
+              <div><span>原料 + 营销 + 固定成本</span><strong id="budgetTotal">¥540</strong></div>
+              <small id="budgetHint">现金充足，可以提交</small>
+            </div>
+            <button id="submitDecisionButton" class="primary-button" type="submit">锁定决策 · 开门营业 <span>→</span></button>
+          </form>
+          <div id="submittedCard" class="submitted-card hidden"><span>✓</span><h3>决策已锁定</h3><p id="submittedSummary">等待其他公司与老师结算。</p></div>
+        </section>
+
+        <aside class="student-side">
+          <section id="roundResultPanel" class="panel result-panel hidden">
+            <div class="panel-heading"><div><span>ROUND REPORT</span><h2>本轮战报</h2></div></div>
+            <div id="studentEventReveal" class="event-reveal"></div>
+            <div id="studentResultStats" class="result-stats"></div>
+          </section>
+          <section class="panel leaderboard-panel">
+            <div class="panel-heading"><div><span>LIVE BOARD</span><h2>实时龙虎榜</h2></div><small>全班同步</small></div>
+            <div id="studentLeaderboard" class="leaderboard"></div>
+          </section>
+        </aside>
+      </div>
+
+      <section id="studentFinal" class="final-stage hidden">
+        <span class="eyebrow dark"><i></i> FINAL REPORT</span>
+        <h1>经营赛结束</h1>
+        <p id="studentFinalLead"></p>
+        <div id="studentPodium" class="podium"></div>
+        <div id="studentCoach" class="coach-card"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="guideModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-card">
+      <button class="modal-close" type="button" data-action="close-guide" aria-label="关闭">×</button>
+      <span class="step-label">CLASS FLOW</span>
+      <h2 id="guideTitle">一堂课，四个步骤</h2>
+      <ol class="flow-list">
+        <li><span>01</span><div><b>教师创建教室</b><p>系统生成 6 位教室号，无需 localhost 或局域网 IP。</p></div></li>
+        <li><span>02</span><div><b>学生组队加入</b><p>每支队伍用一台手机或电脑，输入教室号与公司名。</p></div></li>
+        <li><span>03</span><div><b>新闻研判与决策</b><p>学生从隐晦的商业快讯中推断影响，再提交定价、进货和营销。</p></div></li>
+        <li><span>04</span><div><b>排名与复盘</b><p>排行榜实时同步，终局生成经营画像，老师可导出成绩。</p></div></li>
+      </ol>
+      <div class="callout yellow"><b>网络提示</b><p>所有设备需能访问互联网。校园网络若严格限制 WebRTC，建议提前用教师热点试跑一次。</p></div>
+    </div>
+  </div>
+
+  <div id="knowledgeModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="knowledgeTitle">
+    <div class="modal-card knowledge-card">
+      <button class="modal-close" type="button" data-action="close-knowledge" aria-label="关闭">×</button>
+      <div class="knowledge-topline">
+        <span id="knowledgeCategory" class="tag pink">经营基础</span>
+        <span class="step-label">BUSINESS BYTE</span>
+      </div>
+      <h2 id="knowledgeTitle">机会成本</h2>
+      <p id="knowledgeDefinition" class="knowledge-definition"></p>
+      <div class="knowledge-example">
+        <span>放进这家奶茶店</span>
+        <p id="knowledgeExample"></p>
+      </div>
+      <div class="knowledge-question">
+        <span>想一想</span>
+        <p id="knowledgeQuestion"></p>
+      </div>
+      <div class="knowledge-actions">
+        <button class="secondary-button" type="button" data-action="close-knowledge">知道了</button>
+        <button class="primary-button" type="button" data-action="next-knowledge">再抽一张 <span>↻</span></button>
+      </div>
+    </div>
+  </div>
   <script>
 "use strict";
 
@@ -1339,294 +1628,5 @@ function initialize() {
 
 if (document.readyState !== "loading") { initialize(); } else { document.addEventListener("DOMContentLoaded", initialize); }
 </script>
-</head>
-<body>
-  <div class="ambient ambient-one" aria-hidden="true"></div>
-  <div class="ambient ambient-two" aria-hidden="true"></div>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <section id="welcomeView" class="welcome-view">
-    <nav class="landing-nav" aria-label="主导航">
-      <a class="brand" href="./" aria-label="奶茶大亨首页">
-        <span class="brand-mark" aria-hidden="true">茶</span>
-        <span><b>奶茶大亨</b><small>BUSINESS LAB</small></span>
-      </a>
-      <button class="text-button" type="button" data-action="show-guide">怎么玩？</button>
-    </nav>
-
-    <main class="landing-main">
-      <div class="hero-copy">
-        <span class="eyebrow"><i></i> 商科体验课 · 多人实时沙盘</span>
-        <h1>把一间教室，<br>变成一条<span>商业街。</span></h1>
-        <p>老师掌控市场，学生经营公司。定价、备货、营销，每一个选择都会改变排行榜。</p>
-        <div class="feature-row" aria-label="产品特点">
-          <span>无需安装</span><span>手机可玩</span><span>4–6 人一队</span>
-        </div>
-      </div>
-
-      <div class="entry-card">
-        <div id="roleStep">
-          <div class="step-label">01 / 选择你的身份</div>
-          <h2>今天你是谁？</h2>
-          <button class="role-card teacher" type="button" data-role="teacher">
-            <span class="role-icon">控</span>
-            <span><b>我是教师</b><small>创建教室 · 控制回合 · 点评复盘</small></span>
-            <em>→</em>
-          </button>
-          <button class="role-card student" type="button" data-role="student">
-            <span class="role-icon">创</span>
-            <span><b>我是学生</b><small>加入教室 · 创建公司 · 提交决策</small></span>
-            <em>→</em>
-          </button>
-        </div>
-
-        <form id="teacherSetup" class="setup-form hidden">
-          <button class="back-button" type="button" data-action="back-role">← 返回选择</button>
-          <div class="step-label">02 / 创建教室</div>
-          <h2>设置本次经营赛</h2>
-          <label>教室名称
-            <input id="classNameInput" maxlength="24" value="商科体验课 A 班" autocomplete="off">
-          </label>
-          <label>经营轮数
-            <select id="roundCountInput">
-              <option value="4">4 轮 · 约 45 分钟</option>
-              <option value="5">5 轮 · 约 60 分钟</option>
-              <option value="6">6 轮 · 约 75 分钟</option>
-            </select>
-          </label>
-          <button class="primary-button" type="submit">创建教室 <span>→</span></button>
-          <button id="resumeButton" class="secondary-button hidden" type="button" data-action="resume-room">恢复上次未结束的教室</button>
-        </form>
-
-        <form id="studentSetup" class="setup-form hidden">
-          <button class="back-button" type="button" data-action="back-role">← 返回选择</button>
-          <div class="step-label">02 / 加入教室</div>
-          <h2>创建你的公司</h2>
-          <label>6 位教室号
-            <input id="roomCodeInput" class="code-input" maxlength="6" placeholder="例如 8K3M2P" autocomplete="off" autocapitalize="characters">
-          </label>
-          <label>公司名称
-            <input id="companyNameInput" maxlength="14" placeholder="例如：珍珠突击队" autocomplete="organization">
-          </label>
-          <button id="joinButton" class="primary-button" type="submit">加入教室 <span>→</span></button>
-          <p id="joinHint" class="form-hint">请向老师获取教室号。每支队伍使用一台设备提交决策。</p>
-        </form>
-      </div>
-    </main>
-
-  </section>
-
-  <div id="teacherView" class="app-view hidden">
-    <header class="app-header">
-      <a class="brand compact" href="./"><span class="brand-mark">茶</span><span><b>奶茶大亨</b><small>教师控制台</small></span></a>
-      <div class="header-actions">
-        <span id="teacherNetBadge" class="status-pill"><i></i> 正在创建教室</span>
-        <button class="outline-button small" type="button" data-action="copy-room">复制邀请</button>
-        <button class="icon-button" type="button" data-action="leave-room" aria-label="退出教室">退出</button>
-      </div>
-    </header>
-
-    <main class="dashboard teacher-dashboard">
-      <section class="control-hero">
-        <div>
-          <span class="eyebrow dark"><i></i> <span id="teacherClassName">—</span></span>
-          <div class="room-line"><span>教室号</span><strong id="teacherRoomCode" class="mono">------</strong><button type="button" data-action="copy-code">复制</button></div>
-          <h1 id="teacherStageTitle">等待公司入场</h1>
-          <p id="teacherStageDesc">把教室号展示给学生。学生选择“我是学生”后即可加入。</p>
-        </div>
-        <div class="round-orbit" aria-label="回合进度">
-          <span>ROUND</span><strong id="teacherRoundBig">0</strong><small id="teacherRoundTotal">/ 4</small>
-        </div>
-      </section>
-
-      <section class="metric-strip">
-        <div><span>已加入公司</span><strong id="teamCount">0</strong></div>
-        <div><span>本轮已提交</span><strong id="submitCount">0 / 0</strong></div>
-        <div><span>市场状态</span><strong id="marketStatus">等待开局</strong></div>
-        <div><span>连接方式</span><strong>浏览器直连</strong></div>
-      </section>
-
-      <div class="teacher-grid">
-        <section class="panel teacher-control">
-          <div class="panel-heading"><div><span>CONTROL</span><h2>课堂控制</h2></div><span id="phaseBadge" class="tag">候场</span></div>
-          <div id="lobbyControl">
-            <div class="callout mint"><b>开局前检查</b><p>确认所有公司已入场。开始后仍可允许掉线队伍以原名称重连。</p></div>
-            <button id="startGameButton" class="primary-button" type="button" data-action="start-game">开始第 1 轮 <span>→</span></button>
-            <button class="secondary-button" type="button" data-action="add-demo-teams">加入 3 支演示公司</button>
-          </div>
-          <div id="roundControl" class="hidden">
-            <label class="event-selector">本轮商业新闻（学生可见，结算影响仅教师可见）
-              <select id="eventSelect"></select>
-            </label>
-            <div id="teacherEventPreview" class="event-preview"></div>
-            <button id="settleButton" class="primary-button" type="button" data-action="settle-round">等待所有公司提交</button>
-            <button id="forceSettleButton" class="text-button danger hidden" type="button" data-action="force-settle">按当前提交强制结算</button>
-          </div>
-          <div id="settledControl" class="hidden">
-            <div id="teacherRoundSummary" class="round-summary"></div>
-            <button id="nextRoundButton" class="primary-button" type="button" data-action="next-round">进入下一轮 <span>→</span></button>
-          </div>
-          <div id="finishedControl" class="hidden">
-            <div class="callout yellow"><b>经营赛已结束</b><p>请结合决策记录，引导学生解释“为什么赢”和“为什么亏”。</p></div>
-            <button class="primary-button" type="button" data-action="download-results">导出课堂成绩 CSV <span>↓</span></button>
-          </div>
-        </section>
-
-        <section class="panel roster-panel">
-          <div class="panel-heading"><div><span>COMPANIES</span><h2>公司席位</h2></div><small id="rosterHint">等待加入</small></div>
-          <div id="teacherRoster" class="roster empty-state">还没有公司加入</div>
-          <form id="manualAdjustForm" class="adjust-box hidden">
-            <div class="adjust-label"><i>调</i> 手工调整现金</div>
-            <div class="adjust-row adjust-mode-row">
-              <label class="adjust-radio"><input type="radio" name="adjustMode" value="amount" checked><span>固定金额</span></label>
-              <label class="adjust-radio"><input type="radio" name="adjustMode" value="percent"><span>当轮营收百分比</span></label>
-            </div>
-            <div class="adjust-row">
-              <select id="adjustTeamSelect" aria-label="选择公司"></select>
-              <input id="adjustAmountInput" type="number" step="10" placeholder="±金额" inputmode="numeric" aria-label="调整金额">
-              <button class="adjust-apply" type="submit">调整</button>
-            </div>
-            <small id="adjustHint" class="adjust-hint">正数增加、负数减少，直接修改公司现金余额。仅每轮结算后可用。</small>
-          </form>
-        </section>
-
-        <section class="panel leaderboard-panel">
-          <div class="panel-heading"><div><span>LIVE BOARD</span><h2>实时龙虎榜</h2></div><small>按现金余额排名</small></div>
-          <div id="teacherLeaderboard" class="leaderboard empty-state">开局后显示实时排名</div>
-        </section>
-
-        <section class="panel log-panel">
-          <div class="panel-heading"><div><span>TEACHING FEED</span><h2>课堂动态</h2></div><small>仅教师可见</small></div>
-          <div id="teacherLog" class="activity-log"></div>
-        </section>
-      </div>
-    </main>
-  </div>
-
-  <div id="studentView" class="app-view hidden">
-    <header class="app-header student-header">
-      <a class="brand compact" href="./"><span class="brand-mark">茶</span><span><b id="studentCompanyHeader">我的公司</b><small id="studentClassHeader">正在连接</small></span></a>
-      <div class="header-actions">
-        <button class="knowledge-button" type="button" data-action="open-knowledge" aria-haspopup="dialog"><span>知</span> 商科知识</button>
-        <span id="studentNetBadge" class="status-pill"><i></i> 连接中</span>
-        <button class="icon-button" type="button" data-action="leave-room">退出</button>
-      </div>
-    </header>
-
-    <main class="dashboard student-dashboard">
-      <section class="student-hud">
-        <div><span>当前回合</span><strong id="studentRound">—</strong></div>
-        <div class="cash"><span>公司现金</span><strong id="studentCash">¥1,000</strong></div>
-        <div><span>实时排名</span><strong id="studentRank">—</strong></div>
-        <div><span>教室号</span><strong id="studentRoom" class="mono">------</strong></div>
-      </section>
-
-      <section id="studentWaiting" class="waiting-stage">
-        <div class="waiting-art" aria-hidden="true"><span></span><span></span><span></span></div>
-        <span class="eyebrow dark"><i></i> 已成功入场</span>
-        <h1>公司已挂牌，等待老师开市</h1>
-        <p>可以先和队友商量：你们想走低价规模路线，还是高端品牌路线？</p>
-      </section>
-
-      <div id="studentGame" class="student-game hidden">
-        <section class="panel decision-panel">
-          <div class="panel-heading"><div><span>YOUR MOVE</span><h2 id="decisionTitle">本轮经营决策</h2></div><span id="decisionStateTag" class="tag pink">待提交</span></div>
-          <div id="mysteryEvent" class="mystery-event news-brief">
-            <span>报</span>
-            <div>
-              <small id="studentNewsCategory">今日商业快讯</small>
-              <b id="studentNewsHeadline">市场信息加载中</b>
-              <p id="studentNewsBody">请结合新闻判断需求、供应、成本、竞争或运营风险可能发生的变化。</p>
-            </div>
-          </div>
-          <form id="decisionForm">
-            <div class="decision-field">
-              <div><label for="priceInput">销售定价</label><output id="priceOutput">¥14 / 杯</output></div>
-              <p>价高利润厚，但可能把顾客推向竞争对手。</p>
-              <input id="priceInput" type="range" min="8" max="24" step="1" value="14">
-              <div class="range-labels"><span>走量 ¥8</span><span>均衡 ¥14</span><span>高端 ¥24</span></div>
-            </div>
-            <div class="decision-field">
-              <div><label for="stockInput">原料进货</label><output id="stockOutput">90 杯</output></div>
-              <p>基础成本 ¥4 / 杯。鲜奶不能留到下一轮。</p>
-              <input id="stockInput" type="range" min="0" max="200" step="10" value="90">
-              <div class="range-labels"><span>保守 0</span><span>稳健 100</span><span>激进 200</span></div>
-            </div>
-            <div class="decision-field">
-              <div><label for="marketingInput">营销投入</label><output id="marketingOutput">¥60</output></div>
-              <p>营销会提升客流吸引力，但效果存在边际递减。</p>
-              <input id="marketingInput" type="range" min="0" max="200" step="10" value="60">
-              <div class="range-labels"><span>不投 ¥0</span><span>适度 ¥100</span><span>猛攻 ¥200</span></div>
-            </div>
-            <div class="budget-box">
-              <div><span>原料 + 营销 + 固定成本</span><strong id="budgetTotal">¥540</strong></div>
-              <small id="budgetHint">现金充足，可以提交</small>
-            </div>
-            <button id="submitDecisionButton" class="primary-button" type="submit">锁定决策 · 开门营业 <span>→</span></button>
-          </form>
-          <div id="submittedCard" class="submitted-card hidden"><span>✓</span><h3>决策已锁定</h3><p id="submittedSummary">等待其他公司与老师结算。</p></div>
-        </section>
-
-        <aside class="student-side">
-          <section id="roundResultPanel" class="panel result-panel hidden">
-            <div class="panel-heading"><div><span>ROUND REPORT</span><h2>本轮战报</h2></div></div>
-            <div id="studentEventReveal" class="event-reveal"></div>
-            <div id="studentResultStats" class="result-stats"></div>
-          </section>
-          <section class="panel leaderboard-panel">
-            <div class="panel-heading"><div><span>LIVE BOARD</span><h2>实时龙虎榜</h2></div><small>全班同步</small></div>
-            <div id="studentLeaderboard" class="leaderboard"></div>
-          </section>
-        </aside>
-      </div>
-
-      <section id="studentFinal" class="final-stage hidden">
-        <span class="eyebrow dark"><i></i> FINAL REPORT</span>
-        <h1>经营赛结束</h1>
-        <p id="studentFinalLead"></p>
-        <div id="studentPodium" class="podium"></div>
-        <div id="studentCoach" class="coach-card"></div>
-      </section>
-    </main>
-  </div>
-
-  <div id="guideModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
-    <div class="modal-card">
-      <button class="modal-close" type="button" data-action="close-guide" aria-label="关闭">×</button>
-      <span class="step-label">CLASS FLOW</span>
-      <h2 id="guideTitle">一堂课，四个步骤</h2>
-      <ol class="flow-list">
-        <li><span>01</span><div><b>教师创建教室</b><p>系统生成 6 位教室号，无需 localhost 或局域网 IP。</p></div></li>
-        <li><span>02</span><div><b>学生组队加入</b><p>每支队伍用一台手机或电脑，输入教室号与公司名。</p></div></li>
-        <li><span>03</span><div><b>新闻研判与决策</b><p>学生从隐晦的商业快讯中推断影响，再提交定价、进货和营销。</p></div></li>
-        <li><span>04</span><div><b>排名与复盘</b><p>排行榜实时同步，终局生成经营画像，老师可导出成绩。</p></div></li>
-      </ol>
-      <div class="callout yellow"><b>网络提示</b><p>所有设备需能访问互联网。校园网络若严格限制 WebRTC，建议提前用教师热点试跑一次。</p></div>
-    </div>
-  </div>
-
-  <div id="knowledgeModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="knowledgeTitle">
-    <div class="modal-card knowledge-card">
-      <button class="modal-close" type="button" data-action="close-knowledge" aria-label="关闭">×</button>
-      <div class="knowledge-topline">
-        <span id="knowledgeCategory" class="tag pink">经营基础</span>
-        <span class="step-label">BUSINESS BYTE</span>
-      </div>
-      <h2 id="knowledgeTitle">机会成本</h2>
-      <p id="knowledgeDefinition" class="knowledge-definition"></p>
-      <div class="knowledge-example">
-        <span>放进这家奶茶店</span>
-        <p id="knowledgeExample"></p>
-      </div>
-      <div class="knowledge-question">
-        <span>想一想</span>
-        <p id="knowledgeQuestion"></p>
-      </div>
-      <div class="knowledge-actions">
-        <button class="secondary-button" type="button" data-action="close-knowledge">知道了</button>
-        <button class="primary-button" type="button" data-action="next-knowledge">再抽一张 <span>↻</span></button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
