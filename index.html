@@ -1337,7 +1337,7 @@ function initialize() {
   updateDecisionBudget();
 }
 
-initialize();
+if (document.readyState !== "loading") { initialize(); } else { document.addEventListener("DOMContentLoaded", initialize); }
 </script>
 </head>
 <body>
