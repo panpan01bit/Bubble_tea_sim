@@ -505,7 +505,7 @@ input[type="range"]::-moz-range-thumb { width: 25px; height: 25px; border: 1.5px
             <input id="companyNameInput" maxlength="14" placeholder="例如：珍珠突击队" autocomplete="organization">
           </label>
           <button id="joinButton" class="primary-button" type="submit">加入教室 <span>→</span></button>
-          <p id="joinHint" class="form-hint">请向老师获取教室号。每支队伍使用一台设备提交决策。</p>
+          <p id="joinHint" class="form-hint">请向老师获取教室号。每间教室最多 7 支公司，每支队伍使用一台设备提交决策。</p>
         </form>
       </div>
     </main>
@@ -546,7 +546,7 @@ input[type="range"]::-moz-range-thumb { width: 25px; height: 25px; border: 1.5px
         <section class="panel teacher-control">
           <div class="panel-heading"><div><span>CONTROL</span><h2>课堂控制</h2></div><span id="phaseBadge" class="tag">候场</span></div>
           <div id="lobbyControl">
-            <div class="callout mint"><b>开局前检查</b><p>确认所有公司已入场。开始后仍可允许掉线队伍以原名称重连。</p></div>
+            <div class="callout mint"><b>开局前检查</b><p>每间教室最多 7 支公司。确认所有公司已入场，开始后仍可允许掉线队伍以原名称重连。</p></div>
             <button id="startGameButton" class="primary-button" type="button" data-action="start-game">开始第 1 轮 <span>→</span></button>
             <button class="secondary-button" type="button" data-action="add-demo-teams">加入 3 支演示公司</button>
           </div>
@@ -731,6 +731,7 @@ input[type="range"]::-moz-range-thumb { width: 25px; height: 25px; border: 1.5px
 const TOTAL_START_CASH = 1000;
 const BASE_UNIT_COST = 4;
 const FIXED_COST = 120;
+const MAX_TEAMS = 7;
 const TEACHER_STORAGE_KEY = "bubble-tea-classroom-v2";
 const STUDENT_TOKEN_KEY = "bubble-tea-student-token-v2";
 
@@ -957,6 +958,10 @@ function registerTeacherConnection(connection) {
           connection.send({ type: "rejected", reason: "这个公司名已被使用，请换一个名称" });
           return;
         }
+        if (teacherState.teams.length >= MAX_TEAMS) {
+          connection.send({ type: "rejected", reason: `教室已满（最多 ${MAX_TEAMS} 支公司），请与老师确认` });
+          return;
+        }
         team = { id: token, name, cash: TOTAL_START_CASH, connected: true, demo: false, decision: null, history: [], lastResult: null };
         teacherState.teams.push(team);
         addTeacherLog(`${name} 加入教室`, "公司已领取 ¥1,000 启动资金。 ");
@@ -1162,7 +1167,7 @@ function renderTeacher() {
   dom("teacherStageDesc").textContent = copy.desc;
   dom("teacherRoundBig").textContent = teacherState.round;
   dom("teacherRoundTotal").textContent = `/ ${teacherState.totalRounds}`;
-  dom("teamCount").textContent = teacherState.teams.length;
+  dom("teamCount").textContent = `${teacherState.teams.length} / ${MAX_TEAMS}`;
   dom("submitCount").textContent = `${submitted} / ${teacherState.teams.length}`;
   dom("marketStatus").textContent = copy.market;
   dom("phaseBadge").textContent = copy.badge;
@@ -1209,7 +1214,9 @@ function renderEventPreview() {
 
 function renderTeacherRoster() {
   const roster = dom("teacherRoster");
-  dom("rosterHint").textContent = teacherState.teams.length ? `${teacherState.teams.length} 支公司` : "等待加入";
+  dom("rosterHint").textContent = teacherState.teams.length
+    ? (teacherState.teams.length >= MAX_TEAMS ? `已满员 · ${MAX_TEAMS} 支公司` : `${teacherState.teams.length} / ${MAX_TEAMS} 支公司`)
+    : `等待加入 · 最多 ${MAX_TEAMS} 支`;
   roster.classList.toggle("empty-state", teacherState.teams.length === 0);
   roster.innerHTML = teacherState.teams.length ? teacherState.teams.map(team => `
     <div class="roster-card">
@@ -1822,10 +1829,16 @@ function handleAction(action) {
 
 function addDemoTeams() {
   const demoNames = ["银河制茶局", "薄荷商业社", "珍珠研究所"];
+  let added = 0;
   demoNames.forEach((name, index) => {
-    if (!teacherState.teams.some(team => team.name === name)) teacherState.teams.push({ id: `demo-${Date.now()}-${index}`, name, cash: TOTAL_START_CASH, connected: true, demo: true, decision: null, history: [], lastResult: null });
+    if (teacherState.teams.length >= MAX_TEAMS) return;
+    if (!teacherState.teams.some(team => team.name === name)) {
+      teacherState.teams.push({ id: `demo-${Date.now()}-${index}`, name, cash: TOTAL_START_CASH, connected: true, demo: true, decision: null, history: [], lastResult: null });
+      added += 1;
+    }
   });
-  addTeacherLog("演示公司已入场", "可直接开始，用于教师独立试跑完整流程。 ");
+  if (!added) return showToast(`教室已满（最多 ${MAX_TEAMS} 支公司），无法加入演示公司`);
+  addTeacherLog(added === demoNames.length ? "演示公司已入场" : `演示公司已入场（受上限限制，仅加入 ${added} 支）`, "可直接开始，用于教师独立试跑完整流程。 ");
   saveTeacherState();
   renderTeacher();
 }
